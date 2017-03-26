@@ -1,7 +1,11 @@
 */.metadata
 */*/Debug
+Packages
+sources/DSO-138_Mod
 docs
 .o
 .obj
 .axf
+.cproject
+.project
 
