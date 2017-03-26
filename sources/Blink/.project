@@ -4,7 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>CMSIS_CORE_LPC17xx</project>
-		<project>SE2_Libs</project>
+		<project>SE2_Lib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

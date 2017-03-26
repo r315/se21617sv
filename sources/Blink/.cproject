@@ -37,10 +37,10 @@
 								<option id="com.crt.advproject.gcc.hdrlib.22848333" name="Library headers" superClass="com.crt.advproject.gcc.hdrlib" value="Redlib" valueType="enumerated"/>
 								<option id="com.crt.advproject.gcc.specs.678868922" name="Specs" superClass="com.crt.advproject.gcc.specs" value="com.crt.advproject.gcc.specs.codered" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.1820308411" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SE2_Libs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CMSIS_CORE_LPC17xx/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="/home/hmr/Dropbox/isel/SE2/includes"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SE2_Lib}&quot;"/>
 								</option>
 								<inputType id="com.crt.advproject.compiler.input.1330527720" superClass="com.crt.advproject.compiler.input"/>
 							</tool>
@@ -51,10 +51,10 @@
 								<option id="com.crt.advproject.gas.hdrlib.432241458" name="Library headers" superClass="com.crt.advproject.gas.hdrlib" value="Redlib" valueType="enumerated"/>
 								<option id="com.crt.advproject.gas.specs.1347069007" name="Specs" superClass="com.crt.advproject.gas.specs" value="com.crt.advproject.gas.specs.codered" valueType="enumerated"/>
 								<option id="gnu.both.asm.option.include.paths.61120974" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SE2_Libs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CMSIS_CORE_LPC17xx/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="/home/hmr/Dropbox/isel/SE2/includes"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SE2_Lib}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.473118069" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 								<inputType id="com.crt.advproject.assembler.input.1386963854" name="Additional Assembly Source Files" superClass="com.crt.advproject.assembler.input"/>
@@ -74,12 +74,12 @@
 								</option>
 								<option id="com.crt.advproject.link.gcc.hdrlib.22162002" name="Library" superClass="com.crt.advproject.link.gcc.hdrlib" value="com.crt.advproject.gcc.link.hdrlib.codered.semihost" valueType="enumerated"/>
 								<option id="gnu.c.link.option.libs.1323223107" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="SE2_Libs"/>
 									<listOptionValue builtIn="false" value="CMSIS_CORE_LPC17xx"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="SE2_Lib"/>
 								</option>
 								<option id="gnu.c.link.option.paths.513780011" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SE2_Libs/Debug}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CMSIS_CORE_LPC17xx/Debug}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SE2_Lib/Debug}&quot;"/>
 								</option>
 								<option id="com.crt.advproject.link.crpenable.912896746" name="Enable Code Read Protection" superClass="com.crt.advproject.link.crpenable" value="true" valueType="boolean"/>
 								<option id="com.crt.advproject.link.gcc.multicore.slave.1614569512" name="Multicore configuration" superClass="com.crt.advproject.link.gcc.multicore.slave"/>
@@ -97,11 +97,11 @@
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
-				<externalSettings containerId="SE2_Libs;com.crt.advproject.config.lib.debug.1977215110" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+				<externalSettings containerId="SE2_Lib;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/SE2_Libs"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/SE2_Libs/Debug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="SE2_Libs" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/SE2_Lib"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/SE2_Lib/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="SE2_Lib" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 			</storageModule>
@@ -146,6 +146,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CMSIS_CORE_LPC17xx/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="/home/hmr/Dropbox/isel/SE2/includes"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\Hugo\Dropbox\isel\SE2\includes&quot;"/>
 								</option>
 								<inputType id="com.crt.advproject.compiler.input.335874653" superClass="com.crt.advproject.compiler.input"/>
 							</tool>
@@ -159,6 +160,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CMSIS_CORE_LPC17xx/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="/home/hmr/Dropbox/isel/SE2/includes"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\Hugo\Dropbox\isel\SE2\includes&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1077363917" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 								<inputType id="com.crt.advproject.assembler.input.1944339776" name="Additional Assembly Source Files" superClass="com.crt.advproject.assembler.input"/>

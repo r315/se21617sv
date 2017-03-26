@@ -17,7 +17,7 @@
 #include <stdio.h>
 
 #include <gpio.h>
-#include <time.h>
+#include <time_m3.h>
 
 #define LED2 22
 
@@ -25,7 +25,8 @@ int main(void) {
 volatile static int i = 0 ;
 
    GPIO_Init(LED2,GPIO_OUTPUT,GPIO_HIGH);
-   TIME_Init(SystemCoreClock);
+
+   TIME_Init();
 
     while(1) {
      i++;
