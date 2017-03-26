@@ -11,7 +11,11 @@
 #define _flash_h_
 
 #include <stdint.h>
+#if defined(__LPC17XX__)
+#include <LPC17xx.h>
+#elif defined(__LPC2106__)
 #include <lpc2106.h>
+#endif
 
 #define FLASH_SECTOR_SIZE 0x2000 //8k
 #define FLASH_LAST_SECTOR 0x0F

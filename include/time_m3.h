@@ -9,6 +9,9 @@
 #ifndef _time_m3_h_
 #define _time_m3_h_
 
+#include <time.h>
+#include <stdint.h>
+
 extern volatile unsigned int systemticks;
 
 /**
@@ -31,6 +34,12 @@ uint32_t TIME_Elapsed(uint32_t ticks);
 * @brief Active wait in miliseconds defined by ms
 **/
 void TIME_DelayMs(uint32_t ms);
+
+/**
+* @brief convertion of ticks to miliseconds, using systemtick one tick is one milisecond
+**/
+#define TIME_TicksToMs(ticks) ticks
+
 
 
 

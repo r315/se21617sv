@@ -12,14 +12,19 @@
 
 #include <stdint.h>
 #include <time.h>
+#if defined(__LPC17XX__)
+#include <LPC17xx.h>
+#define RTC_PowerUp() LPC_SC->PCONP |= RTC_ON
+#elif defined(__LPC2106__)
 #include <lpc2106.h>
+#define RTC_PowerUp() SC->PCONP |= RTC_ON
+#endif
 
 #define RTC_ON     (1<<9)
 #define RTC_CLKEN  (1<<0)
 #define RTC_CTCRST (1<<2)
 #define RTC_RTCALF (1<<1)
 
-#define RTC_PowerUp() SC->PCONP |= RTC_ON
 
 #define RTC_DIVIDER 32768
 

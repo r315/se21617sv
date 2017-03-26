@@ -13,10 +13,12 @@
 #include <stdint.h>
 
 #if defined(__LPC17XX__)
-#define LED2 22
-#else
+#define LED 22
+#elif defined(__LPC2106__)
 #include <lpc2106.h>
 #define LED 16
+#else
+#define LED 0
 #endif
 
 #define LED_ON  1

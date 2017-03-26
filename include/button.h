@@ -20,17 +20,30 @@ typedef struct{
     uint32_t htime;
 }BUTTON_Controller;
 
-#define BUTTON_DEFAULT_HOLD_TIME 2000   //2 seconds
-
-enum Benvent{
+enum Bevent{
     BUTTON_EMPTY = 0,
     BUTTON_PRESSED,
     BUTTON_TIMING,
     BUTTON_HOLD,
     BUTTON_RELEASED	
-}Bstate;
+};
+#if defined(__LPC17XX__)
+/**
+* @brief Button connections
+*		P0.26  Left
+*		P0.2  Fire
+*		P0.3  Right
+*       P0.21  Save
+**/
+#define BUTTON_L (1<<26)
+#define BUTTON_R (1<<3)
+#define BUTTON_F (1<<2)
+#define BUTTON_S (1<<21)
 
+#define BUTTON_GetValue()  LPC_GPIO0->FIOPIN
+#define BUTTON_SetInput(x) LPC_GPIO0->FIODIR &= ~(x)
 
+#else
 /**
 * @brief Button connections
 *		P0.11  Left
@@ -43,22 +56,18 @@ enum Benvent{
 #define BUTTON_F (1<<12)
 #define BUTTON_S (1<<15)
 
-#define BUTTON_MASK (BUTTON_L | BUTTON_R | BUTTON_F | BUTTON_S)
-
-#if defined(__LPC17XX__)
-#define BUTTON_PORT LPC_GPIO0->FIOPIN
-#define BUTTON_PORT_DIR GPIO0->FIODIR
-#else
-#define BUTTON_PORT GPIO_Read()
-#define BUTTON SetInput(x) GPIO_SetInputN(x)
+#define BUTTON_GetValue()  GPIO_Read()
+#define BUTTON_SetInput(x) GPIO_SetInputN(x)
 #endif
 
-#if defined(_EMU_)
+#if defined(__EMU__)
 #define loop BUTTON_GetEvents() != 256 //SDL_QUIT
 #else
 #define loop 1
 #endif
 
+#define BUTTON_DEFAULT_HOLD_TIME 2000   //2 seconds
+#define BUTTON_MASK (BUTTON_L | BUTTON_R | BUTTON_F | BUTTON_S)
 
 /**
 * @brief Faz a iniciação do sistema para permitir o acesso aos botões

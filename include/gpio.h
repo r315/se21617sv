@@ -50,7 +50,7 @@ void GPIO_SetState(uint32_t pin, uint8_t state);
 #define GPIO_SetOutput(pin) LPC_GPIO0->FIODIR |= (1<<pin)
 
 
-#else
+#elif defined(__LPC2106__)
 #include <lpc2106.h>
 /*
 #define GPIO_Set(n) GPIO0->SET = (1 << n)  // change the state of only one pin

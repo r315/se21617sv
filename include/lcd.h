@@ -52,7 +52,7 @@ void LCD_SetColors(uint32_t _fColor, uint32_t _bColor);
 /**
 * @brief Posiciona o cursor na linha y e coluna x do mostrador.
 **/
-void LCD_Goto(int x, int y);
+void LCD_Goto(uint16_t x, uint16_t y);
 
 /**
 * @brief Posiciona o cursor na linha seguinte
