@@ -1,11 +1,26 @@
+#Eclipse related
+.cproject
+.project
+.dep/
+.settings/
+.xml
+
+# temp files
+~
+
+#object files and build files
+*.o
+*.obj
+*.axf
+*.map
+*.ld
+*.mk
+*.d
+*.a
+
 */.metadata
 */*/Debug
 Packages
 sources/DSO-138_Mod
 docs
-.o
-.obj
-.axf
-.cproject
-.project
 
