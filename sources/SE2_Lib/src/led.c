@@ -25,9 +25,20 @@ int LED_GetState(void){
 void LED_SetState(int state){
     __state = state & 1;
     
+#if defined(__LPC17XX__)
+    if(__state)				// led is connected in common Anode configuration
+        GPIO_Set(__pin);
+    else
+        GPIO_Clr(__pin);
+#else
     if(!__state)				// led is connected in common Anode configuration
         GPIO_Set(__pin);
     else
         GPIO_Clr(__pin);
+#endif
+}
+
+void LED_Toggle(void){
+	LED_SetState(~__state);
 }
 

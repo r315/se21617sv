@@ -200,7 +200,7 @@ void LCD_Data(uint16_t data);
 /**
  @brief 
  **/
-void LCD_Goto(uint16_t x, uint16_t y);
+void LCD_GotoMem(uint16_t x, uint16_t y);
 
 /**
  @brief 

@@ -1,5 +1,6 @@
-#include <clock.h>
+//#include <clock.h>
 #include <ili9328.h>
+#include <time_m3.h>
 
 //--------------------------------------------------------
 //
@@ -30,7 +31,7 @@ return reg;
 #endif
 //--------------------------------------------------------
 //write data to LCD
-//TODO: ver se é possivel alterar 2 sinals simultaneamente
+//TODO: ver se ï¿½ possivel alterar 2 sinals simultaneamente
 //--------------------------------------------------------
 void LCD_Data(uint16_t data)
 {	
@@ -66,7 +67,7 @@ void LCD_Fill(uint32_t count, uint16_t color){
 //-----------------------------------------------------*/
 // Set Gram addres inside a created window
 //------------------------------------------------------
-void LCD_Goto(uint16_t x, uint16_t y){
+void LCD_GotoMem(uint16_t x, uint16_t y){
 	LCD_Cmd(GRAM_ADX);
 	LCD_Data(x);
    	LCD_Cmd(GRAM_ADY);
@@ -87,7 +88,7 @@ void LCD_Window(uint16_t x, uint16_t y, uint16_t w, uint16_t h)
 	LCD_Cmd(END_ADY);
 	LCD_Data(y + h-1);
 	
-	LCD_Goto(x,y);
+	LCD_GotoMem(x,y);
 }
 //-----------------------------------------------------------------*/
 //	 set VLE bit on GATE_SCAN_CTRL2(61h) first
@@ -110,7 +111,7 @@ void LCD_Init(void){
 	
 	LCDCS1;LCDWR1;LCDRD1;
 	LCDRST0;		 
-	DelayMs(100);
+	TIME_DelayMs(100);
 	LCDRST1;
 	LCDCS0;
 
@@ -118,7 +119,7 @@ void LCD_Init(void){
 	LCD_Data(0x8000); 					//set the internal vcore voltage
 	LCD_Cmd(LCD_START_OSC);
 	LCD_Data(0x0001); 					//start oscillator
-	DelayMs(50);	
+	TIME_DelayMs(50);
 
 	LCD_Cmd(LCD_DRIV_OUT_CTRL);
 	LCD_Data(SHIFT_DIR);
@@ -152,23 +153,23 @@ void LCD_Init(void){
 	LCD_Data(0x0000);
 	LCD_Cmd(LCD_POW_CTRL4);
 	LCD_Data(0x0000); 					
-	DelayMs(200);
+	TIME_DelayMs(200);
 
 	LCD_Cmd(LCD_POW_CTRL1);
 	LCD_Data(0x17B0);
 	LCD_Cmd(LCD_POW_CTRL2);
 	LCD_Data(0x0137); 					
-	DelayMs(50);
+	TIME_DelayMs(50);
 
 	LCD_Cmd(LCD_POW_CTRL3);
 	LCD_Data(0x013C);
-	DelayMs(50);
+	TIME_DelayMs(50);
 
 	LCD_Cmd(LCD_POW_CTRL4);
 	LCD_Data(0x1400);
 	LCD_Cmd(LCD_POW_CTRL7);
 	LCD_Data(0x0007);
-	DelayMs(50);	
+	TIME_DelayMs(50);
 
 	LCD_Cmd(LCD_GAMMA_CTRL1);
 	LCD_Data(0x0007);
@@ -238,7 +239,7 @@ void LCD_Init(void){
 
 	LCD_Cmd(LCD_DISP_CTRL1);
 	LCD_Data(0x0173);
-	DelayMs(500);
+	TIME_DelayMs(500);
 	
 	LCD_BKL_ON;
 }

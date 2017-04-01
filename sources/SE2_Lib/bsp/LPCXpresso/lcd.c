@@ -1,5 +1,6 @@
 #include <spi.h>
 #include <lcd.h>
+
 #include "ili9341.h"
 
 #define FONT (unsigned char *)font8x16
@@ -29,7 +30,7 @@ uint8_t digit, count;
 	if(!value){                    // se valor for zero
         do{
     		LCD_WriteChar('0');    // ou os especificados por padding
-		}while(--padding);         // apenas se mosta um digito zero
+		}while(padding--);         // apenas se mosta um digito zero
 		return;
 	}
 
@@ -69,7 +70,7 @@ void LCD_WriteString(char *str){
 		LCD_WriteChar(*str++);
 }
 
-void LCD_Goto(int x, int y){
+void LCD_Goto(uint16_t x, uint16_t y){
 		_x = x;
 		_y = y;
 }
