@@ -41,6 +41,11 @@ int LED_GetState(void);
 **/
 void LED_SetState(int state);
 
+/**
+* @brief Altera o estado corrente para o oposto
+**/
+void LED_Toggle(void);
+
 
 #endif
 

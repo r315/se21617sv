@@ -27,7 +27,7 @@ enum Bevent{
     BUTTON_HOLD,
     BUTTON_RELEASED	
 };
-#if defined(__LPC17XX__)
+#if defined(__BB__)
 /**
 * @brief Button connections
 *		P0.26  Left
@@ -43,6 +43,21 @@ enum Bevent{
 #define BUTTON_GetValue()  LPC_GPIO0->FIOPIN
 #define BUTTON_SetInput(x) LPC_GPIO0->FIODIR &= ~(x)
 
+#elif defined(__LPCX__)
+/**
+* @brief Button connections
+*		P0.26  Left
+*		P0.2  Fire
+*		P0.3  Right
+*       P0.21  Save
+**/
+#define BUTTON_F (1<<26)
+#define BUTTON_S (1<<3)
+#define BUTTON_R (1<<2)
+#define BUTTON_L (1<<21)
+
+#define BUTTON_GetValue()  LPC_GPIO0->FIOPIN          //do not call this functions directly
+#define BUTTON_SetInput(x) LPC_GPIO0->FIODIR &= ~(x)
 #else
 /**
 * @brief Button connections
