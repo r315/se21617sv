@@ -1,7 +1,7 @@
 
 #include <gpio.h>
 
-#if defined(__LPC17XX__)
+#if defined(__LPCX__)
 #include <LPC17xx.h>
 
 void GPIO_SetState(uint32_t pin, uint8_t state){
