@@ -4,6 +4,7 @@
 .dep/
 .settings/
 .xml
+.metadata/
 
 # temp files
 ~
