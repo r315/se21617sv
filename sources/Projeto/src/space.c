@@ -68,8 +68,10 @@
 
     void eraseProjectils(Projectile *pj, uint8_t n){
         while(n--){
-            LCD_OffsetWindow(pj->x, pj->y, PROJECTILE_W, PROJECTILE_H);
-            LCD_Fill(PROJECTILE_W * PROJECTILE_H, BGCOLOR);
+            if(pj->inmotion){
+                LCD_OffsetWindow(pj->x, pj->y, PROJECTILE_W, PROJECTILE_H);
+                LCD_Fill(PROJECTILE_W * PROJECTILE_H, BGCOLOR);
+            }
             pj += 1;
         }
     }
@@ -190,6 +192,16 @@
         loadTank(&gd->tank);    
         loadAliens(gd->aliens, Aliens0, SPRITE_H * 3);
         gd->score = 0;    
+        gd->alienscount = MAX_ALIENS;
+        gd->lives = MAX_LIVES;
+        gd->state = RUNNING;
+    }
+
+    void showScoreTable(void){
+        LCD_SetColors(GREEN, BLACK);
+        LCD_Goto(SCREEN_SX + 30, SCREEN_SY + 50);
+        LCD_WriteString("Enter Name: \n");
+        //LCD_WriteString("Full Score: ");
     }
 
     void popSpace(void *ptr){
@@ -235,13 +247,25 @@ void countFps(void){
 }
     void space(int b){
     uint8_t n;
+    uint16_t alienpoints;
     static int8_t dir = -1;
     static uint8_t speed = SPEED;
     static uint8_t f;
     static uint32_t frametime;
 
-        
-        if(TIMER0_GetValue() > frametime){
+
+        if(gamedata->state > RUNNING){
+
+             switch(b){
+                case BUTTON_L:   break;
+                case BUTTON_R:   break;
+                case BUTTON_F:   
+                    newGame(gamedata);
+                    break;
+                default: break;
+            }
+
+        }else if(TIMER0_GetValue() > frametime){
             
             switch(b){
                 case BUTTON_L:  moveShip(&gamedata->tank,-1); break;
@@ -276,7 +300,15 @@ void countFps(void){
             // move projectils and update score
             for(n=0; n < TANK_MAX_PROJECTILES; n++){
                 moveProjectile(&gamedata->tankprojectiles[n]);
-                gamedata->score += checkColision(&gamedata->tankprojectiles[n], gamedata->aliens);            
+                alienpoints= checkColision(&gamedata->tankprojectiles[n], gamedata->aliens);
+                gamedata->score += alienpoints;
+                if(alienpoints){
+                    gamedata->alienscount--;
+                    if(!gamedata->alienscount){
+                        gamedata->state = END;
+                        showScoreTable();
+                    }
+                }
             }
             
             updateScore(gamedata->score);

@@ -28,6 +28,14 @@
 #define PROJECTILE_W 2
 #define PROJECTILE_H 6
 
+#define MAX_LIVES 3
+
+enum gStates{
+    RUNNING,
+    END,
+    SELECT
+};
+
 typedef struct _sprite{
     int x;
     int y;
@@ -49,6 +57,9 @@ typedef struct _gameData{
     uint8_t state;
 	uint32_t topscore;
 	uint8_t lives;
+    uint8_t alienscount;
+    uint8_t end;
+    uint8_t playername[3];
     Sprite tank;
 	Sprite bonusalien;
     Sprite aliens[MAX_ALIENS];
