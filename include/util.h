@@ -10,4 +10,5 @@
 #include <time_emu.h>
 #define TIMER0_GetValue() TIME_GetValue()
 #define TIMER0_Elapse(x) TIME_Elapsed(x)
+#define TIMER0_TicksToMs(x) x
 #endif

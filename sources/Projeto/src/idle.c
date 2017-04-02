@@ -2,6 +2,7 @@
 #include <time.h>
 #include <rtc.h>
 #include <button.h>
+#include <util.h>
 #include "idle.h"
 #include "proj.h"
 #include <util.h>

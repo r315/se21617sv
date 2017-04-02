@@ -17,9 +17,10 @@ ifeq ($(UNAME_S),Linux)
 COMPILER_FLAGS = -D_EMU_ -Wall
 LINKER_FLAGS = -lSDL2
 else
+DRIVE=C
 COMPILER_FLAGS = -D_EMU_ -w -Wl,-subsystem,windows
-INCLUDES += -I"C:/tools/SDL2/include" -I"C:/tools/SDL2/include"
-LINKER_FLAGS = -L"C:/tools/SDL2/lib" -LC:/tools/MinGw/lib -lmingw32 -lSDL2main -lSDL2
+INCLUDES += -I$(DRIVE):/tools/SDL2/include -I$(DRIVE):/tools/SDL2/include
+LINKER_FLAGS = -L$(DRIVE):/tools/SDL2/lib -L$(DRIVE):/tools/MinGw/lib -lmingw32 -lSDL2main -lSDL2
 endif
 
 all : $(TARGET)

@@ -1,13 +1,13 @@
 /**
-* @file		time_m3.h
+* @file		time_emu.h
 * @brief	Contains API header for coretex time related functions.
 *     		
 * @version	1.0
 * @date		25 Mar. 2017
 * @author	Hugo Reis
 **********************************************************************/
-#ifndef _time_m3_h_
-#define _time_m3_h_
+#ifndef _time_emu_h_
+#define _time_emu_h_
 
 #include <time.h>
 #include <stdint.h>

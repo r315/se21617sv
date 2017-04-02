@@ -2,6 +2,7 @@
 #include <lcd.h>
 #include <rtc.h>
 #include <button.h>
+#include <util.h>
 #include "config.h"
 #include "proj.h"
 
