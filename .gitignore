@@ -1,9 +1,10 @@
 #Eclipse related
-.cproject
-.project
+*.cproject
+*.project
 .dep/
 .settings/
-.xml
+*.xml
+.metadata/
 
 # temp files
 ~
