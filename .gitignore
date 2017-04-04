@@ -1,6 +1,6 @@
 #Eclipse related
-*.cproject
-*.project
+.cproject
+.project
 .dep/
 .settings/
 *.xml

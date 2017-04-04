@@ -80,16 +80,16 @@ emulator: $(TARGET)
 	$(XOBJPATH)/$(TARGET)
 
 else
-
+DRIVE =C
 COMPILER_FLAGS = -D_EMU_ -w -Wl,-subsystem,windows
-INCLUDES += -I"C:/tools/SDL2/include" -I"C:/tools/SDL2/include" -I../../includes
-LINKER_FLAGS = -L"C:/tools/SDL2/lib" -LC:/tools/MinGw/lib -L../emulator -lemu -lmingw32 -lSDL2main -lSDL2
+INCLUDES += -I$(DRIVE):/tools/SDL2/include -I$(DRIVE):/tools/SDL2/include -I../../include -I../emulator
+LINKER_FLAGS = -L$(DRIVE):/tools/SDL2/lib -L$(DRIVE):/tools/MinGw/lib -L../emulator -lemu -lmingw32 -lSDL2main -lSDL2
 
 $(TARGET).exe: $(XOBJS)
 	$(GPP) $(XOBJS) $(LINKER_FLAGS) -o $(TARGET)
 
 %.obj : %.c
-	$(GPP) $(INCSPATH) -Wall -lSDL2 -D_EMU_ -c $< -o $(<:.c=.obj)
+	$(GPP) $(INCSPATH) -Wall -D__EMU__ -c $< -o $(<:.c=.obj)
 	
 emulator: $(TARGET).exe
 	cmd /c $(TARGET).exe
@@ -99,7 +99,7 @@ $(TARGET): $(XOBJS)
 	$(GPP)  $(XOBJS) $(XCFLAGS) $(addprefix -L, $(XLIBPATH)) $(XLIBS) -o $(XOBJPATH)/$(TARGET)
 
 $(XOBJPATH)/%.obj : %.c
-	$(GPP) $(addprefix -I, $(XINCPATH)) $(XCFLAGS) -c $< -o $@
+	$(GPP) -D__EMU__ $(addprefix -I, $(XINCPATH)) $(XCFLAGS) -c $< -o $@
 	
 
 	

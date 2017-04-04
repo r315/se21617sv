@@ -19,13 +19,22 @@
 #define ALIENS_COLS 6
 #define ALIENS_ROWS 6
 
-#define MAX_PROJECTILES 3
+#define TANK_MAX_PROJECTILES 1
+#define ALIENS_MAX_PROJECTILES 3
 #define MAX_ALIENS ALIENS_COLS * ALIENS_ROWS
 #define SPRITES_DATA spcinv
 #define TANK_DATA SPRITES_DATA + (SPRITE_SIZE * 6)
 
 #define PROJECTILE_W 2
 #define PROJECTILE_H 6
+
+#define MAX_LIVES 3
+
+enum gStates{
+    RUNNING,
+    END,
+    SELECT
+};
 
 typedef struct _sprite{
     int x;
@@ -48,11 +57,14 @@ typedef struct _gameData{
     uint8_t state;
 	uint32_t topscore;
 	uint8_t lives;
+    uint8_t alienscount;
+    uint8_t end;
+    uint8_t playername[3];
     Sprite tank;
 	Sprite bonusalien;
     Sprite aliens[MAX_ALIENS];
-    Projectile tankprojectiles[MAX_PROJECTILES];
-	Projectile invadersprojectiles[MAX_PROJECTILES];
+    Projectile tankprojectiles[TANK_MAX_PROJECTILES];
+	Projectile invadersprojectiles[ALIENS_MAX_PROJECTILES];
   //  Projectile alienprojectiles[MAX_PROJECTILES];
 }GameData;
 

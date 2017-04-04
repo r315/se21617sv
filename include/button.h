@@ -44,6 +44,7 @@ enum Bevent{
 #define BUTTON_SetInput(x) LPC_GPIO0->FIODIR &= ~(x)
 
 #elif defined(__LPCX__)
+#include <LPC17xx.h>
 /**
 * @brief Button connections
 *		P0.26  Left
