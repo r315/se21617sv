@@ -58,7 +58,7 @@ GPP = gcc
 VPATH = $(dir $(XSRCS))
 
 XSRCPATH =src
-XOBJPATH =obj
+XOBJPATH =Debug/src
 XINCPATH =../../include ../emulator inc
 XLIBPATH =../emulator
 
