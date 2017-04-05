@@ -40,10 +40,10 @@
     void loadTank(Sprite *sp){
         sp->data = (uint8_t*)TANK_DATA;
         sp->x = (SCREEN_W/2)-8;
-        sp->y = SCREEN_H-16;
+        sp->y = SCREEN_H - SPRITE_H - (LCD_GetFontHeight());
     }
 
-    void moveShip(Sprite *tk, int8_t dir){
+    void moveTank(Sprite *tk, int8_t dir){
     int newx;
     int8_t d;
 
@@ -131,15 +131,27 @@
         }    
     }
 
-    int8_t moveAliens( Sprite *als, const uint8_t *alienFrame, int8_t dir, int8_t height){
-    uint8_t i;
+    int8_t moveAliens( Sprite *als, const uint8_t *alienFrame, int8_t dir){
+    uint8_t i, drop = 0;
 
-        if(((dir < 0) && (als[0].x <= 0)) || (dir > 0 && als[ALIENS_COLS - 1].x >= SCREEN_W-SPRITE_W))
-            dir  = -dir;
+        if(((dir < 0) && (als[0].x <= 0)) || (dir > 0 && als[ALIENS_COLS - 1].x >= SCREEN_W-SPRITE_W)){
+            dir  = -dir;            
+            drop = ALIENS_DROP_GRAVITY;
+            LCD_OffsetWindow(als[0].x, als[0].y, SPRITE_W * ALIENS_COLS, ALIENS_DROP_GRAVITY);   
+            LCD_Fill(SPRITE_SIZE * ALIENS_COLS * ALIENS_DROP_GRAVITY, BGCOLOR);
+        }
+
+        if(dir < 0){
+			LCD_OffsetWindow(als[ALIENS_COLS - 1].x + SPRITE_W - ALIENS_MOVE_SPEED, als[ALIENS_COLS - 1].y, ALIENS_MOVE_SPEED, SPRITE_H * ALIENS_ROWS);   
+            LCD_Fill(ALIENS_MOVE_SPEED * SPRITE_H * ALIENS_ROWS, BGCOLOR);
+        }else{
+			LCD_OffsetWindow(als[0].x, als[0].y,  ALIENS_MOVE_SPEED, SPRITE_H * ALIENS_ROWS);   
+            LCD_Fill(ALIENS_MOVE_SPEED * SPRITE_H * ALIENS_ROWS, BGCOLOR);
+        }
 
         for(i = 0; i< MAX_ALIENS; i++, alienFrame +=  1){
             als[i].x += dir;
-            als[i].y += height;
+            als[i].y += drop;
             
             if(als[i].alive){
                 drawSprite(&als[i]);
@@ -154,7 +166,7 @@
         return dir;
     }
 
-    uint8_t checkColision(Projectile *proj, Sprite *als){
+    uint8_t checkPlayerHit(Projectile *proj, Sprite *als){
     uint8_t i;
     uint8_t score;
         if(proj->inmotion == OFF)
@@ -175,6 +187,34 @@
             }
         }
         return 0;
+    }
+
+    uint8_t checkAlienHit(Projectile *proj, Sprite *player){
+        if(proj->inmotion == OFF)
+            return OFF;   
+        
+        if(player->x <= proj->x && (player->x + SPRITE_W) >= proj->x){
+            if(player->y <= proj->y + PROJECTILE_H){
+                eraseProjectils(proj, 1);
+                proj->inmotion = OFF;
+                return ON;
+            }           
+        }
+        return OFF;
+    }
+
+    uint8_t checkAliensOnBottom(Sprite *aliens, Sprite *player){
+    uint8_t i;
+    	for(i = 0; i< MAX_ALIENS; i++){
+ 			if(aliens[i].alive){
+                if(aliens[i].x <= player->x && (aliens[i].x + SPRITE_W) >= player->x){
+                    if(aliens[i].y + SPRITE_H >= player->y)
+                        return ON;
+                    
+                } 
+            }
+    	}
+    	return OFF;	
     }
 
     void updateScore(uint32_t scr){
@@ -228,8 +268,8 @@
 	    BUTTON_SetHoldTime(80);
 
         gamedata = (GameData*)ptr; 
-        moveShip(&gamedata->tank,0);   
-        moveAliens(gamedata->aliens, Aliens1, 0,0);
+        moveTank(&gamedata->tank,0);   
+        moveAliens(gamedata->aliens, Aliens1, 0);
         updateScore(gamedata->score);
 	    updateLives(gamedata->lives);
     }
@@ -246,12 +286,13 @@ void countFps(void){
     fps++;
 }
     void space(int b){
-    uint8_t n;
+    uint8_t n, randalien;
     uint16_t alienpoints;
-    static int8_t dir = -1;
+    static int8_t dir = ALIENS_MOVE_SPEED;
     static uint8_t speed = SPEED;
     static uint8_t f;
     static uint32_t frametime;
+
 
 
         if(gamedata->state > RUNNING){
@@ -268,17 +309,17 @@ void countFps(void){
         }else if(TIMER0_GetValue() > frametime){
             
             switch(b){
-                case BUTTON_L:  moveShip(&gamedata->tank,-1); break;
-                case BUTTON_R:  moveShip(&gamedata->tank,1); break;
+                case BUTTON_L:  moveTank(&gamedata->tank,-1); break;
+                case BUTTON_R:  moveTank(&gamedata->tank, 1); break;
                 case BUTTON_F:  newProjectile(gamedata->tankprojectiles, gamedata->tank.x + SPRITE_W/2, gamedata->tank.y -  PROJECTILE_H, -1, PINK); break;            
                 
                 case (BUTTON_F | BUTTON_L): 
-                    moveShip(&gamedata->tank,-1);
+                    moveTank(&gamedata->tank,-1);
                     newProjectile(gamedata->tankprojectiles, gamedata->tank.x + SPRITE_W/2, gamedata->tank.y - PROJECTILE_H, -1, PINK);
                     break;
                 
                 case (BUTTON_F | BUTTON_R):
-                    moveShip(&gamedata->tank,1);
+                    moveTank(&gamedata->tank,1);
                     newProjectile(gamedata->tankprojectiles, gamedata->tank.x + SPRITE_W/2, gamedata->tank.y - PROJECTILE_H, -1, PINK);
                     break;
                 
@@ -290,17 +331,21 @@ void countFps(void){
             //eraseProjectils(gamedata->tankprojectiles, TANK_TANK_MAX_PROJECTILES);
 
             //move aliens
-             if(!(--speed)){
-                dir = moveAliens(gamedata->aliens, (f & 4)? Aliens0 : Aliens1, dir, 0); //move aliens, no descend
+             if(!(--speed)){             	
+                dir = moveAliens(gamedata->aliens, (f & 4)? Aliens0 : Aliens1, dir);
+                randalien = rand() % MAX_ALIENS;
+                newProjectile(gamedata->alienprojectiles, gamedata->aliens[randalien].x, gamedata->aliens[randalien].y, 1, RED);
                 speed = SPEED;
                 f++;
+                if(checkAliensOnBottom(gamedata->aliens, &gamedata->tank))
+                	newGame(gamedata);
             }  
             //TODO: implement aliens down and shot
             
             // move projectils and update score
             for(n=0; n < TANK_MAX_PROJECTILES; n++){
                 moveProjectile(&gamedata->tankprojectiles[n]);
-                alienpoints= checkColision(&gamedata->tankprojectiles[n], gamedata->aliens);
+                alienpoints = checkPlayerHit(&gamedata->tankprojectiles[n], gamedata->aliens);
                 gamedata->score += alienpoints;
                 if(alienpoints){
                     gamedata->alienscount--;
@@ -310,10 +355,19 @@ void countFps(void){
                     }
                 }
             }
+
+            eraseProjectils(gamedata->alienprojectiles,ALIENS_MAX_PROJECTILES);
+            for(n=0; n < ALIENS_MAX_PROJECTILES; n++){
+                moveProjectile(&gamedata->alienprojectiles[n]);
+                if(checkAlienHit(&gamedata->alienprojectiles[n], &gamedata->tank)){
+                	gamedata->lives--;
+                	updateLives(gamedata->lives);
+                }
+             }
             
             updateScore(gamedata->score);
                         
             countFps();
-            frametime = TIMER0_GetValue() + 0;  //50fps
+            frametime = TIMER0_GetValue() + 10;  //50fps
         }
     }

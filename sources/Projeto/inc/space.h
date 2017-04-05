@@ -14,11 +14,13 @@
 #define BGCOLOR BLACK	
 #define SPACE_FONT_COLOR RGB(12,32,20)
 
-#define SPEED 5
+#define SPEED 1         //frames for alien update 
 
 #define ALIENS_COLS 6
 #define ALIENS_ROWS 6
-
+#define ALIENS_DROP_GRAVITY 8  //number of pixels in each drop
+#define ALIENS_MOVE_SPEED 16    //number of pixels for side movement
+ 
 #define TANK_MAX_PROJECTILES 1
 #define ALIENS_MAX_PROJECTILES 3
 #define MAX_ALIENS ALIENS_COLS * ALIENS_ROWS
@@ -64,7 +66,7 @@ typedef struct _gameData{
 	Sprite bonusalien;
     Sprite aliens[MAX_ALIENS];
     Projectile tankprojectiles[TANK_MAX_PROJECTILES];
-	Projectile invadersprojectiles[ALIENS_MAX_PROJECTILES];
+	Projectile alienprojectiles[ALIENS_MAX_PROJECTILES];
   //  Projectile alienprojectiles[MAX_PROJECTILES];
 }GameData;
 

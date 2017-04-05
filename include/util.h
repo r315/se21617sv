@@ -1,3 +1,5 @@
+#ifndef _util_h_
+#define _util_h_
 
 #if defined(__LPC17XX__)
 #include <time_m3.h>
@@ -12,3 +14,6 @@
 #define TIMER0_Elapse(x) TIME_Elapsed(x)
 #define TIMER0_TicksToMs(x) x
 #endif
+
+uint16_t rand(void);
+#endif /* _util_h_ */
