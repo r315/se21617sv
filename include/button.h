@@ -40,6 +40,8 @@ enum Bevent{
 #define BUTTON_F (1<<2)
 #define BUTTON_S (1<<21)
 
+#define BUTTON_MASK (BUTTON_L | BUTTON_R | BUTTON_F | BUTTON_S)
+
 #define BUTTON_GetValue()  LPC_GPIO0->FIOPIN
 #define BUTTON_SetInput(x) LPC_GPIO0->FIODIR &= ~(x)
 
@@ -48,14 +50,21 @@ enum Bevent{
 /**
 * @brief Button connections
 *		P0.26  Left
-*		P0.2  Fire
-*		P0.3  Right
-*       P0.21  Save
+*		P0.2   Fire   (A)
+*		P0.3   Right
+*       P0.21  Save   (Up)
+*       P0.27  Down
 **/
 #define BUTTON_F (1<<26)
 #define BUTTON_S (1<<3)
 #define BUTTON_R (1<<2)
 #define BUTTON_L (1<<21)
+
+#define BUTTON_A BUTTON_F
+#define BUTTON_U BUTTON_S
+#define BUTTON_D (1<<1)
+
+#define BUTTON_MASK (BUTTON_U | BUTTON_D | BUTTON_L | BUTTON_R | BUTTON_A)
 
 #define BUTTON_GetValue()  LPC_GPIO0->FIOPIN          //do not call this functions directly
 #define BUTTON_SetInput(x) LPC_GPIO0->FIODIR &= ~(x)
@@ -72,6 +81,8 @@ enum Bevent{
 #define BUTTON_F (1<<12)
 #define BUTTON_S (1<<15)
 
+#define BUTTON_MASK (BUTTON_L | BUTTON_R | BUTTON_F | BUTTON_S)
+
 #define BUTTON_GetValue()  GPIO_Read()
 #define BUTTON_SetInput(x) GPIO_SetInputN(x)
 #endif
@@ -83,7 +94,7 @@ enum Bevent{
 #endif
 
 #define BUTTON_DEFAULT_HOLD_TIME 2000   //2 seconds
-#define BUTTON_MASK (BUTTON_L | BUTTON_R | BUTTON_F | BUTTON_S)
+
 
 /**
 * @brief Faz a iniciação do sistema para permitir o acesso aos botões
