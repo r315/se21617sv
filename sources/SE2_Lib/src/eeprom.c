@@ -12,11 +12,14 @@
 Eeprom eeprom;
 
 void EEPROM_Init(void){
-	I2C_Init((I2C_Controller*)&eeprom, I2C_IF0, EEPROM_MAX_CLOCK, EEPROM_CONTROL_BYTE);
+	I2C_Init((I2C_Controller*)&eeprom, EEPROM_INTERFACE, EEPROM_MAX_CLOCK, EEPROM_CONTROL_BYTE);
 }
 
-//int8_t I2C_StateMachine(I2C_Controller *i2cifc);
-
+/**
+ * @brief this state machine dedicated to process eeprom write and read sequences
+ * Write  |S| dev+W | MSB | LSB | data | data+n |P|
+ * Read   |S| dev+W | MSB | LSB |S| dev+R | data | data+n |P|
+ **/
 int8_t I2C_EEpromStateMachine(Eeprom *eeprom){
 
 	switch(eeprom->i2cif->I2STAT)
@@ -24,29 +27,37 @@ int8_t I2C_EEpromStateMachine(Eeprom *eeprom){
 	case I2C_START:
 		eeprom->i2cif->I2DAT = eeprom->device;
 		eeprom->i2cif->I2CONCLR = I2C_SI | I2C_STA;
+		eeprom->status = ADDRESS_HIGH;  //next state
 		break;
 
 	case I2C_REPEATEAD_START:
 		eeprom->i2cif->I2DAT = eeprom->device | 1;  // SET READ BIT
 		eeprom->i2cif->I2CONCLR = I2C_SI | I2C_STA;
+		eeprom->status = DATA_READ;
 		break;
 
 	//SLA+W was transmitted, ACK from slave was received
 	//address high must be sent
 	case I2C_SLA_W_ACK:
-		eeprom->status = ADDRESS_HIGH;
-		eeprom->i2cif->I2DAT = eeprom->address >> 8;
+		eeprom->i2cif->I2DAT = eeprom->address >> 8; 	// send address high
 		eeprom->i2cif->I2CONCLR = I2C_SI | I2C_STA | I2C_STO;
+		eeprom->status = ADDRESS_LOW;
 		break;
 
 	//Data was transmitted and ACK received,
 	//if address write, send address low else send remaining data
 	case I2C_DTA_W_ACK:
 		switch(eeprom->status){
-			case ADDRESS_HIGH:
-				eeprom->status = DATA_WRITE;            // next byte is data
-				eeprom->i2cif->I2DAT = eeprom->address; // for now send address low
+			case ADDRESS_LOW:
+				eeprom->i2cif->I2DAT = eeprom->address; // send address low
 				eeprom->i2cif->I2CONCLR = I2C_SI;
+				eeprom->status = (eeprom->operation == DATA_WRITE) ? DATA_WRITE : REPEATED_START;
+				break;
+
+			case REPEATED_START:
+				eeprom->i2cif->I2CONSET = I2C_STA;  // send Repeated start
+				eeprom->i2cif->I2CONCLR = I2C_SI;
+				eeprom->status = DATA_READ;
 				break;
 
 			case DATA_WRITE:
@@ -55,8 +66,8 @@ int8_t I2C_EEpromStateMachine(Eeprom *eeprom){
 					eeprom->i2cif->I2CONSET = I2C_AA;
 					eeprom->count--;
 				}else{
-					eeprom->status = IDLE;
 					eeprom->i2cif->I2CONSET = I2C_STO;
+					eeprom->status = IDLE;
 				}
 				eeprom->i2cif->I2CONCLR = I2C_SI;
 				break;
@@ -79,32 +90,31 @@ int8_t I2C_EEpromStateMachine(Eeprom *eeprom){
 			break;
 
 		case I2C_SLA_W_NACK:
-			eeprom->status = IDLE;
 			eeprom->i2cif->I2CONCLR = I2C_STA | I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
+			eeprom->status = IDLE;
 			break;
 
 		case I2C_DTA_W_NACK:
-			eeprom->status = IDLE;
-			eeprom->i2cif->I2CONCLR = I2C_SI;
+			//eeprom->i2cif->I2CONCLR = I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
 			break;
 
 		case I2C_SLA_R_NACK:
-			eeprom->status = IDLE;
 			eeprom->i2cif->I2CONCLR = I2C_STA | I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
+			eeprom->status = IDLE;
 			break;
 
 		case I2C_DTA_R_NACK:
-			eeprom->status = IDLE;
 			eeprom->i2cif->I2CONCLR = I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
+			eeprom->status = IDLE;
 			break;
 
 		case I2C_SLA_LOST:
-			eeprom->status = IDLE;
 			eeprom->i2cif->I2CONCLR = I2C_SI | I2C_STA | I2C_STO;
+			eeprom->status = IDLE;
 			break;
 
 		case I2C_NO_INFO:
@@ -116,28 +126,25 @@ int8_t I2C_EEpromStateMachine(Eeprom *eeprom){
 	return eeprom->status;
 }
 
-int8_t EEPROM_Write(uint16_t address, uint8_t *data, uint32_t size){
+int8_t EEPROM_Start(uint16_t address, uint8_t *data, uint32_t size){
 	eeprom.address  = address;
 	eeprom.count = size;
 	eeprom.data = data;
-	eeprom.operation = ADDRESS_WRITE;
 	eeprom.i2cif->I2CONSET = I2C_STA;
 
 	while(I2C_EEpromStateMachine(&eeprom) != IDLE ){
 		while(!(eeprom.i2cif->I2CONSET & I2C_SI));
 	}
+	return eeprom.status;
+}
 
-	return 0;
+int8_t EEPROM_Write(uint16_t address, uint8_t *data, uint32_t size){
+	eeprom.operation = DATA_WRITE;
+	return EEPROM_Start(address,data,size);
 }
 
 int8_t EEPROM_Read(uint16_t address, uint8_t *data, uint32_t size){
-
-	eeprom.address  = address;
-	eeprom.count = 0;
-	eeprom.data = data;
-	eeprom.operation = ADDRESS_WRITE;
-
-
-return 0;
+	eeprom.operation = DATA_READ;
+	return EEPROM_Start(address,data,size);
 }
 

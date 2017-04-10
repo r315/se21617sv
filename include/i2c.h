@@ -23,13 +23,13 @@
 
 enum _i2cStates{
 	IDLE = 0,
+	REPEATED_START,
 	SLA_READ,
-	SLA_ADDR,
+	SLA_WRITE,
 	DATA_WRITE,
 	DATA_READ,
 	ADDRESS_HIGH,
 	ADDRESS_LOW,
-	ADDRESS_WRITE,
 	ERROR_SLA_W_NACK,
 	ERROR_SLA_R_NACK,
 	ERROR_DTA_W_NACK,
@@ -39,11 +39,9 @@ enum _i2cStates{
 typedef struct _i2cControl{
 	LPC_I2C_TypeDef *interface; // i2c interface to be used
 	uint8_t device;             // 8-bit slave address
-	uint16_t address;
-	volatile uint8_t status;             // current status
-	volatile uint8_t operation;
 	uint8_t *data;              // data buffer for r/w
 	uint32_t count;             // data size
+	volatile uint8_t status;    // current status
 }I2C_Controller;
 
 //P0.27 -> SDA

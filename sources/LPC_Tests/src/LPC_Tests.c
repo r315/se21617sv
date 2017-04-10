@@ -25,9 +25,8 @@
 
 #include <eeprom.h>
 
-// TODO: insert other include files here
-
-// TODO: insert other definitions and declarations here
+uint8_t data1[] = {0,10,'A','B','C','D','E','F'};
+I2C_Controller i2cbus;
 
 int main(void) {
 	uint8_t i;
@@ -56,6 +55,8 @@ int main(void) {
 
 	EEPROM_Init();
 
+	I2C_Init(&i2cbus,I2C_IF0,EEPROM_MAX_CLOCK, EEPROM_CONTROL_BYTE);
+
 
 
 	// Force the counter to be placed into memory
@@ -76,7 +77,7 @@ int main(void) {
 				EEPROM_Read(0x0,buf,256);
 
 				for(i=0; i< 10; i++)
-					printf("%x ",buf[i]);
+					printf("%c ",buf[i]);
 				break;
 
 			case BUTTON_L:
@@ -89,9 +90,13 @@ int main(void) {
 				break;
 			case BUTTON_U:
 				LCD_WriteString("UP   ");
+				I2C_Write(&i2cbus,data1,8);
 				break;
 			case BUTTON_D:
+				i=0;
+				I2C_Write(&i2cbus,data1,2);
 				LCD_WriteString("DOWN ");
+				I2C_Read(&i2cbus,buf,16);
 				break;
 			}
 		}
