@@ -13,13 +13,14 @@
 #include <stdint.h>
 
 typedef struct _eeprom{
-	uint8_t  control;
 	uint16_t address;
 	int8_t result;
 }Eeprom;
 
 #define EEPROM_MAX_CLOCK     400000 //400khz for 24AA256 (4A256)
 #define EEPROM_CONTROL_BYTE  0xA0
+#define EEPROM_CONTROL_SIZE  3
+#define EEPROM_ADDRESS_SIZE  2
 
 /**
 * @brief Inicializa a eeprom, indicando o interface a que se encontra ligado
