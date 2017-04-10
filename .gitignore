@@ -5,6 +5,8 @@
 .settings/
 *.xml
 .metadata/
+core
+makefile
 
 # temp files
 ~
