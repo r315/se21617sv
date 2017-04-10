@@ -43,6 +43,11 @@ void I2C_Init(I2C_Controller *i2cifc, uint8_t ifNumber, uint32_t freq, uint8_t d
 	i2cifc->status = IDLE;
 }
 
+/**
+ * @brief this state machine only process write and read sequences
+ * Write  |S|dev+W| data | data+n |P|
+ * Read   |S|dev+R| data | data+n |P|
+ **/
 int8_t I2C_StateMachine(I2C_Controller *i2cifc){
 
 	switch(i2cifc->interface->I2STAT)

@@ -11,9 +11,16 @@
 #define _EEPROM_H_
 
 #include <stdint.h>
+#include <i2c.h>
 
 typedef struct _eeprom{
+	LPC_I2C_TypeDef *i2cif;
+	uint8_t device;             // 8-bit slave addresss
 	uint16_t address;
+	uint8_t *data;              // data buffer for r/w
+	uint32_t count;
+	uint8_t operation;
+	uint8_t status;
 	int8_t result;
 }Eeprom;
 

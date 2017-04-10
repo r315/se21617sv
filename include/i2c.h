@@ -23,6 +23,7 @@
 
 enum _i2cStates{
 	IDLE = 0,
+	SLA_READ,
 	SLA_ADDR,
 	DATA_WRITE,
 	DATA_READ,
