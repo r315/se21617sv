@@ -28,9 +28,10 @@ uint8_t padding = base>>8;
 uint8_t digit, count;
 	
 	if(!value){                    // se valor for zero
+		padding = (padding != 0) ? padding - 1 : padding;
         do{
     		LCD_WriteChar('0');    // ou os especificados por padding
-		}while(padding--);         // apenas se mosta um digito zero
+		}while(padding--);       // apenas se mosta um digito zero
 		return;
 	}
 
