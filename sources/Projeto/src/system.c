@@ -1,11 +1,19 @@
 #include <stdio.h>
 #include <string.h>
-#include <spi.h>
 #include <led.h>
 #include <lcd.h>
 #include <rtc.h>
 #include <button.h>
+#if defined(__LPCX__)
+#include <eeprom.h>
+#include <spi.h>
+#elif defined(__BB__)
+#include <eeprom.h>
+#else
 #include <flash.h>
+#include <spi.h>
+#endif
+
 #include <util.h>
 
 const int defaultRtc[]={0,0,0,0,0,2010,0,0,0,0,0};
@@ -17,7 +25,7 @@ const int defaultRtc[]={0,0,0,0,0,2010,0,0,0,0,0};
   * */
 void SYS_Init(void){
 
-	#if defined(__LPC17XX__)
+	#if defined(__LPCX__)
 
 	TIME_Init();
 
@@ -26,6 +34,8 @@ void SYS_Init(void){
 	LCD_Init();
 
 	SPI_Init(6000000, SSP_16BIT); //after init use full speed
+
+	EEPROM_Init();
 
 	#elif defined(__LPC2106__)
     

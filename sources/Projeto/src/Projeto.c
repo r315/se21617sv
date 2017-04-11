@@ -115,7 +115,7 @@ char *msg;
 
     switch(res){
         case CMD_SUCESS:
-            msg = "Save ok"; break;
+            msg = " Save ok "; break;
 
         case SECTOR_NOT_PREPARED_FOR_WRITE_OPERATION :
             LCD_WriteString("Sector Not Ready");break;
@@ -137,6 +137,9 @@ char *msg;
 
         case COMPARE_ERROR:
             msg = "Compare Error";break;
+
+        case 0x30: //TODO: fix enums
+            msg = " Saving..";break;
 
         default:
                 LCD_Goto(0,0);
@@ -237,7 +240,7 @@ uint32_t button,res;
 
                         case BUTTON_R:  //Erase Top Scores
                             memset(&saveddata, 0, sizeof(SaveData));
-                            //saveData(&saveddata, sizeof(SaveData));
+                            saveData(&saveddata, sizeof(SaveData));
                             switchTo(IDLE);
                             BUTTON_WaitEvent(BUTTON_RELEASED);
                         default: break;
@@ -263,6 +266,7 @@ uint32_t button,res;
                 break;
 
             case SAVE:
+            	displaySaveResult(0x30);
                 LED_SetState(LED_ON);
                 //printf("Score: %u\n",saveddata.spaceInvaders.score);
                 saveTopScore(saveddata.spaceInvaders.score, saveddata.topscores);
