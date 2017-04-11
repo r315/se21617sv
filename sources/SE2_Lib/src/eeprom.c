@@ -7,7 +7,6 @@
 * @author	Hugo Reis
 **********************************************************************/
 #include <eeprom.h>
-#include <time_m3.h>
 
 Eeprom eeprom;
 
@@ -68,6 +67,7 @@ int8_t I2C_EEpromStateMachine(Eeprom *eeprom){
 				}else{
 					eeprom->i2cif->I2CONSET = I2C_STO;
 					eeprom->status = IDLE;
+					eeprom->operation = IDLE;
 				}
 				eeprom->i2cif->I2CONCLR = I2C_SI;
 				break;
@@ -92,29 +92,33 @@ int8_t I2C_EEpromStateMachine(Eeprom *eeprom){
 		case I2C_SLA_W_NACK:
 			eeprom->i2cif->I2CONCLR = I2C_STA | I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
-			eeprom->status = IDLE;
+			eeprom->status = ERROR_SLA_W_NACK;
+			eeprom->operation = IDLE;
 			break;
 
 		case I2C_DTA_W_NACK:
 			//eeprom->i2cif->I2CONCLR = I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
+			eeprom->status = ERROR_DTA_W_NACK;
+			eeprom->operation = IDLE;
 			break;
 
 		case I2C_SLA_R_NACK:
 			eeprom->i2cif->I2CONCLR = I2C_STA | I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
-			eeprom->status = IDLE;
+			eeprom->status = ERROR_SLA_R_NACK;
+			eeprom->operation = IDLE;
 			break;
 
 		case I2C_DTA_R_NACK:
 			eeprom->i2cif->I2CONCLR = I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
-			eeprom->status = IDLE;
+			eeprom->operation = IDLE;
 			break;
 
 		case I2C_SLA_LOST:
 			eeprom->i2cif->I2CONCLR = I2C_SI | I2C_STA | I2C_STO;
-			eeprom->status = IDLE;
+			eeprom->operation = IDLE;
 			break;
 
 		case I2C_NO_INFO:
@@ -123,7 +127,7 @@ int8_t I2C_EEpromStateMachine(Eeprom *eeprom){
 			break;
 	}
 
-	return eeprom->status;
+	return eeprom->operation;
 }
 
 int8_t EEPROM_Start(uint16_t address, uint8_t *data, uint32_t size){
@@ -139,8 +143,22 @@ int8_t EEPROM_Start(uint16_t address, uint8_t *data, uint32_t size){
 }
 
 int8_t EEPROM_Write(uint16_t address, uint8_t *data, uint32_t size){
+int8_t status;
 	eeprom.operation = DATA_WRITE;
-	return EEPROM_Start(address,data,size);
+	while(size){
+		if(size > EEPROM_PAGE_SIZE){
+			status =  EEPROM_Start(address,data,EEPROM_PAGE_SIZE);
+			size -= EEPROM_PAGE_SIZE;
+			address += EEPROM_PAGE_SIZE;
+		}else{
+			status =  EEPROM_Start(address,data,size);
+			size -= size;
+		}
+
+		if(status)
+			break;
+	}
+	return status;
 }
 
 int8_t EEPROM_Read(uint16_t address, uint8_t *data, uint32_t size){
