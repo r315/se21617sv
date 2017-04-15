@@ -31,14 +31,15 @@
       * @brief draws the given sprite on is x,y coordenates
       * */
     void drawSprite(Sprite *sp){               
-        LCD_OffsetWindow(sp->x, sp->y,SPRITE_W,SPRITE_H);   
-        LCD_IndexedColor((uint16_t*)pal1, sp->data, SPRITE_SIZE);
+        LCD_OffsetWindow(sp->x, sp->y,SPRITE_W,SPRITE_H);
+        LCD_IndexedColor((uint16_t*)pal1, (uint8_t*)&SPRITES_DATA[SPRITE_SIZE * sp->data], SPRITE_SIZE);
+
     }
      /**
       * @brief copy bitmap data of tank from flash to sprite on ram
       * */
     void loadTank(Sprite *sp){
-        sp->data = (uint8_t*)TANK_DATA;
+    	sp->data = TANK_DATA_IDX;
         sp->x = (SCREEN_W/2)-8;
         sp->y = SCREEN_H - SPRITE_H - (LCD_GetFontHeight());
     }
@@ -121,7 +122,7 @@
                 als[a].x = x;
                 als[a].y = y;
                 als[a].type = (*al) - 1;
-                als[a].data = (uint8_t*)(SPRITES_DATA + (als[j].type * SPRITE_SIZE));
+                als[a].data = als[j].type;
                 als[a].alive = ON;
                 x += SPRITE_W;
                 a++;
@@ -155,7 +156,7 @@
             
             if(als[i].alive){
                 drawSprite(&als[i]);
-                als[i].data = (uint8_t*)(SPRITES_DATA + (((*alienFrame) - 1) * SPRITE_SIZE));
+                als[i].data = (*alienFrame) - 1;
             }
             else
             {
@@ -326,10 +327,6 @@ void countFps(void){
                 default: break;
             }
             
-             //erase tank projectiles
-            eraseProjectils(gamedata->tankprojectiles, TANK_MAX_PROJECTILES);
-            //eraseProjectils(gamedata->tankprojectiles, TANK_TANK_MAX_PROJECTILES);
-
             //move aliens
              if(!(--speed)){             	
                 dir = moveAliens(gamedata->aliens, (f & 4)? Aliens0 : Aliens1, dir);
@@ -339,10 +336,11 @@ void countFps(void){
                 f++;
                 if(checkAliensOnBottom(gamedata->aliens, &gamedata->tank))
                 	newGame(gamedata);
-            }  
-            //TODO: implement aliens down and shot
+            }
             
-            // move projectils and update score
+            //erase player projectiles
+            eraseProjectils(gamedata->tankprojectiles, TANK_MAX_PROJECTILES);
+            // move player projectil and update score
             for(n=0; n < TANK_MAX_PROJECTILES; n++){
                 moveProjectile(&gamedata->tankprojectiles[n]);
                 alienpoints = checkPlayerHit(&gamedata->tankprojectiles[n], gamedata->aliens);
@@ -356,7 +354,9 @@ void countFps(void){
                 }
             }
 
+            // erase aliens projectiles
             eraseProjectils(gamedata->alienprojectiles,ALIENS_MAX_PROJECTILES);
+            //move aliens projectiles
             for(n=0; n < ALIENS_MAX_PROJECTILES; n++){
                 moveProjectile(&gamedata->alienprojectiles[n]);
                 if(checkAlienHit(&gamedata->alienprojectiles[n], &gamedata->tank)){
@@ -364,7 +364,7 @@ void countFps(void){
                 	updateLives(gamedata->lives);
                 }
              }
-            
+
             updateScore(gamedata->score);
                         
             countFps();

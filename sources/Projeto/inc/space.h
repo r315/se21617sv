@@ -14,18 +14,18 @@
 #define BGCOLOR BLACK	
 #define SPACE_FONT_COLOR RGB(12,32,20)
 
-#define SPEED 1         //frames for alien update 
+#define SPEED 4         //frames for alien update
 
 #define ALIENS_COLS 6
 #define ALIENS_ROWS 6
-#define ALIENS_DROP_GRAVITY 8  //number of pixels in each drop
-#define ALIENS_MOVE_SPEED 16    //number of pixels for side movement
+#define ALIENS_DROP_GRAVITY 4  //number of pixels in each drop
+#define ALIENS_MOVE_SPEED 4    //number of pixels for side movement
  
 #define TANK_MAX_PROJECTILES 1
 #define ALIENS_MAX_PROJECTILES 3
 #define MAX_ALIENS ALIENS_COLS * ALIENS_ROWS
 #define SPRITES_DATA spcinv
-#define TANK_DATA SPRITES_DATA + (SPRITE_SIZE * 6)
+#define TANK_DATA_IDX 6
 
 #define PROJECTILE_W 2
 #define PROJECTILE_H 6
@@ -43,7 +43,7 @@ typedef struct _sprite{
     int y;
     uint8_t type;    
     uint8_t alive;
-	uint8_t *data;
+	uint8_t data;
 }Sprite;
 
 typedef struct projectile{
