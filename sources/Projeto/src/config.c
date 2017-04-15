@@ -88,18 +88,18 @@ signed char step;
     switch(BUTTON_GetEvents()){
         
         case BUTTON_PRESSED:
-            if(b == BUTTON_F){        
+            if(b == BUTTON_R){
                 if((++field) == (YEAR + 1))
                     field = HOUR;
                 step = 0;
                 break;               
             }            
-            if(b == BUTTON_S) return 0;            
+            if(b == BUTTON_F) return 0;
             
         case BUTTON_HOLD:
             switch(b){
-                case BUTTON_L: step = -1; break;        
-                case BUTTON_R: step =  1; break;
+                case BUTTON_D: step = -1; break;
+                case BUTTON_U: step =  1; break;
                 default: return 1;
             }
             break;

@@ -112,6 +112,7 @@ uint8_t count = 0;
 
 void displaySaveResult(uint32_t res){
 char *msg;
+uint32_t dl = 1500;
 
     switch(res){
         case CMD_SUCESS:
@@ -139,7 +140,8 @@ char *msg;
             msg = "Compare Error";break;
 
         case 0x30: //TODO: fix enums
-            msg = " Saving..";break;
+            msg = " Saving.."; dl = 0; break;
+
 
         default:
                 LCD_Goto(0,0);
@@ -152,7 +154,7 @@ char *msg;
 
     LCD_Goto( (LCD_W/2) - (strlenInPixels(msg)/2), LCD_H /2);
     LCD_WriteString(msg);
-    TIME_DelayMs(1500);
+    TIME_DelayMs(dl);
 }
 
  /**
@@ -234,7 +236,7 @@ uint32_t button,res;
                 if(BUTTON_GetEvents() == BUTTON_HOLD){
                     switch(button){
                         //case BUTTON_L:
-                        case (BUTTON_L| BUTTON_R):
+                        case (BUTTON_D):
                             state = switchTo(CONFIG);
                             break;
 

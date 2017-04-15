@@ -14,7 +14,7 @@ static const char title[]={
     "           IDLE\n\n"
     "F   -  start new Game\n"
     "S   -  Load Game\n"
-    "L&R -  for config\n\n"
+    "D   -  for config(2s)\n\n"
     "Top Scores:\n"
 };
 
@@ -63,7 +63,7 @@ void idle(void){
 struct tm rtc;    
     if( TIME_Elapsed(updateTime) > 1000){
         RTC_GetValue(&rtc);   
-        LCD_Goto(0,LCD_H-16);        
+        LCD_Goto(0,LCD_H - LCD_GetFontHeight());
         PRINT_DateTime(&rtc);                
         updateTime = TIMER0_GetValue();
     }
