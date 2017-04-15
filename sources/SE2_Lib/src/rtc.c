@@ -1,40 +1,84 @@
 #include <rtc.h>
 
-#if defined(__LPC17XX__)
+#if defined(__LPCX__) || defined(__BB__)
 void RTC_Init(struct tm *dateTime){
-
+	RTC_PowerUp();
+	LPC_RTC->CCR = 2;	// stop clock and reset
+	LPC_RTC->ILR = 3;
+	LPC_RTC->CIIR = 0; /* Counter Increment Interrupt Disable */
+	RTC_DeactivateAlarm(RTC_AMR_OFF);
+	RTC_SetValue(dateTime);
 }
 
 void RTC_GetValue(struct tm *dateTime){
+volatile uint64_t *consolidate = (uint64_t*) &LPC_RTC->CTIME0;
+uint64_t rtcval;
 
+	do{
+		rtcval = *consolidate;
+	}while(rtcval != *consolidate);
+
+	dateTime->tm_sec = rtcval & 0x3F;  		  // 0-59 range
+	dateTime->tm_min = (rtcval>>8) & 0x3F;
+	dateTime->tm_hour = (rtcval>>16) & 0x3F;
+	dateTime->tm_wday = (rtcval>>24) & 0x07;  //0-6 range
+
+	dateTime->tm_mday = (rtcval>>32) & 0x1F;  //1-31 range
+	dateTime->tm_mon = (rtcval>>40) & 0x0F;   //1-12 range
+	dateTime->tm_year = (rtcval>>48) & 0x0FFF;//0-4095 range
+
+	dateTime->tm_yday = LPC_RTC->CTIME2 & 0x07FF; //1-365 range
 }
 
 void RTC_SetValue(struct tm *dateTime){
-
+	LPC_RTC->CCR = 0;	// stop clock
+	LPC_RTC->SEC = dateTime->tm_sec % 60;
+	LPC_RTC->MIN = dateTime->tm_min % 60;
+	LPC_RTC->HOUR = dateTime->tm_hour % 24;
+	LPC_RTC->DOM = (dateTime->tm_mday > 1 && dateTime->tm_mday < 32)? dateTime->tm_mday : 1;
+	LPC_RTC->MONTH = (dateTime->tm_mon > 1 && dateTime->tm_mon < 13)? dateTime->tm_mon : 1;
+	LPC_RTC->DOW = (dateTime->tm_wday > 1 && dateTime->tm_wday < 7)? dateTime->tm_wday : 0;
+	LPC_RTC->YEAR = (dateTime->tm_year > 0 && dateTime->tm_year < 4096)? dateTime->tm_year : 1900;
+	LPC_RTC->DOY = (dateTime->tm_yday > 1 && dateTime->tm_yday < 366)? dateTime->tm_yday : 1;
+	LPC_RTC->CCR = RTC_CLKEN;
 }
 
 void RTC_GetAlarmValue(struct tm *dateTime){
-
+	dateTime->tm_sec  = LPC_RTC->ALSEC;
+	dateTime->tm_min  = LPC_RTC->ALMIN;
+	dateTime->tm_hour = LPC_RTC->ALHOUR;
+	dateTime->tm_mday = LPC_RTC->ALDOM;
+	dateTime->tm_mon  = LPC_RTC->ALMON;
+	dateTime->tm_wday = LPC_RTC->ALDOW;
+	dateTime->tm_year = LPC_RTC->ALYEAR;
+	dateTime->tm_yday = LPC_RTC->ALDOY;
 }
 
 void RTC_SetAlarmValue(struct tm *dateTime){
-
+	LPC_RTC->ALSEC = dateTime->tm_sec % 60;
+	LPC_RTC->ALMIN = dateTime->tm_min % 60;
+	LPC_RTC->ALHOUR = dateTime->tm_hour % 24;
+	LPC_RTC->ALDOM = (dateTime->tm_mday > 1 && dateTime->tm_mday < 32)? dateTime->tm_mday : 1;
+	LPC_RTC->ALMON = (dateTime->tm_mon > 1 && dateTime->tm_mon < 13)? dateTime->tm_mon : 1;
+	LPC_RTC->ALDOW = (dateTime->tm_wday > 1 && dateTime->tm_wday < 7)? dateTime->tm_wday : 0;
+	LPC_RTC->ALYEAR =  (dateTime->tm_year > 0 && dateTime->tm_year < 4096)? dateTime->tm_year : 1900;
+	LPC_RTC->ALDOY = (dateTime->tm_yday > 1 && dateTime->tm_yday < 366)? dateTime->tm_yday : 1;
 }
 
 uint32_t RTC_CheckAlarm(void){
-   return 0;
+   return LPC_RTC->ILR & RTC_RTCALF;
 }
 
 void RTC_ClearAlarm(void){
-
+	LPC_RTC->ILR |= RTC_RTCALF;
 }
 
 void RTC_ActivateAlarm(uint8_t alarm){
-
+	LPC_RTC->AMR &= ~alarm;
 }
 
 void RTC_DeactivateAlarm(uint8_t alarm){
-
+	LPC_RTC->AMR |= alarm;
 }
 
 

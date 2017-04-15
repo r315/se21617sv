@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 #include <time.h>
-#if defined(__LPC17XX__)
+#if defined(__LPCX__) || defined(__BB__)
 #include <LPC17xx.h>
 #define RTC_PowerUp() LPC_SC->PCONP |= RTC_ON
 #elif defined(__LPC2106__)
