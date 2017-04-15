@@ -12,17 +12,11 @@
 #if defined(__LPCX__) || defined(__BB__)
 
 int saveData(void *data, int dataSize){
-	int res = EEPROM_Write(0, data, dataSize);
-	if(res)
-	 return res;
-	return 0;
+	return EEPROM_Write(0, data, dataSize);
 }
 
 int restoreData(void *data, int dataSize){
-	int res = EEPROM_Read(0, data, dataSize);
-		if(res)
-		 return res;
-		return 0;
+	return EEPROM_Read(0, data, dataSize);
 }
 #else
 #if defined(__EMU__)
