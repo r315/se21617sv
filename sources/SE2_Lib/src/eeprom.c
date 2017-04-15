@@ -11,7 +11,7 @@
 Eeprom eeprom;
 
 void EEPROM_Init(void){
-	I2C_Init((I2C_Controller*)&eeprom, EEPROM_INTERFACE, EEPROM_MAX_CLOCK, EEPROM_CONTROL_BYTE);
+	I2C_Init((I2C_Controller*)&eeprom, EEPROM_INTERFACE, I2C_DEFAULT_CLOCK , EEPROM_CONTROL_BYTE);
 }
 
 /**
@@ -114,7 +114,7 @@ int8_t I2C_EEpromStateMachine(Eeprom *eeprom){
 			break;
 
 		case I2C_DTA_R_NACK:
-			*(eeprom->data) = eeprom->i2cif->I2DAT;
+			*(eeprom->data) = eeprom->i2cif->I2DAT;  //save last received byte
 			eeprom->i2cif->I2CONCLR = I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
 			eeprom->operation = IDLE;

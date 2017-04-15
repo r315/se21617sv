@@ -16,27 +16,27 @@ void I2C_Init(I2C_Controller *i2cifc, uint8_t ifNumber, uint32_t freq, uint8_t d
 	case I2C_IF0:
 		i2cifc->interface = LPC_I2C0;
 		LPC_SC->PCONP |= I2C0_ON;
-		LPC_SC->PCLKSEL0 |= (3<<14); //CCLK / 8
 		I2C0_ConfigPins();
 		break;
 	case I2C_IF1:
 		i2cifc->interface = LPC_I2C1;
 		LPC_SC->PCONP |= I2C1_ON;
-		LPC_SC->PCLKSEL1 |= (3<<6); //CCLK / 8
 		I2C1_ConfigPins();
 		break;
 	case I2C_IF2:
 		i2cifc->interface = LPC_I2C2;
 		LPC_SC->PCONP |= I2C2_ON;
-		LPC_SC->PCLKSEL1 |= (3<<20); //CCLK / 8
 		I2C2_ConfigPins();
 		break;
 	}
 
-	i2cifc->device = dev;
+	LPC_SC->PCLKSEL0 &= ~(3<<14);
+	LPC_SC->PCLKSEL0 |=  (2<<14); //CCLK / 2
 
-	i2cifc->interface->I2SCLH = 128;
-	i2cifc->interface->I2SCLL = 128;
+	i2cifc->interface->I2SCLH = ((SystemCoreClock/2)/freq)>>2;
+	i2cifc->interface->I2SCLL = ((SystemCoreClock/2)/freq)>>2;
+
+	i2cifc->device = dev;
 
 	i2cifc->interface->I2CONSET = I2C_I2EN ;
 	i2cifc->interface->I2CONCLR = I2C_STA | I2C_STO | I2C_SI;
@@ -47,6 +47,7 @@ void I2C_Init(I2C_Controller *i2cifc, uint8_t ifNumber, uint32_t freq, uint8_t d
  * @brief this state machine only process write and read sequences
  * Write  |S| dev+W | data | data+n |P|
  * Read   |S| dev+R | data | data+n |P|
+ * TODO: Furder tests
  **/
 int8_t I2C_StateMachine(I2C_Controller *i2cifc){
 

@@ -27,7 +27,7 @@ typedef struct _eeprom{
 #define EEPROM_CONTROL_BYTE  0xA0
 #define EEPROM_CONTROL_SIZE  3
 #define EEPROM_ADDRESS_SIZE  2
-#define EEPROM_INTERFACE I2C_IF0
+#define EEPROM_INTERFACE I2C_IF1
 #define EEPROM_PAGE_SIZE 32
 
 /**

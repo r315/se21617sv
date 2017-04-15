@@ -21,19 +21,21 @@
 #define I2C1_ON (1<<19) //PCI2C1
 #define I2C2_ON (1<<26) //PCI2C2
 
+#define I2C_DEFAULT_CLOCK 100000 //Standard 100Khz
+
 enum _i2cStates{
 	IDLE = 0,
-	REPEATED_START,
-	SLA_READ,
-	SLA_WRITE,
-	DATA_WRITE,
-	DATA_READ,
-	ADDRESS_HIGH,
-	ADDRESS_LOW,
-	ERROR_SLA_W_NACK,
-	ERROR_SLA_R_NACK,
-	ERROR_DTA_W_NACK,
-	ERROR_DTA_R_NACK
+	REPEATED_START,    //0x01
+	SLA_READ,          //0x02
+	SLA_WRITE,         //0x03
+	DATA_WRITE,        //0x04
+	DATA_READ,		   //0x05
+	ADDRESS_HIGH,      //0x06
+	ADDRESS_LOW,       //0x07
+	ERROR_SLA_W_NACK,  //0x08
+	ERROR_SLA_R_NACK,  //0x09
+	ERROR_DTA_W_NACK,  //0x0A
+	ERROR_DTA_R_NACK   //0x0B
 };
 
 typedef struct _i2cControl{
