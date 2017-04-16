@@ -1,13 +1,16 @@
 #include <rtc.h>
 
 #if defined(__LPCX__) || defined(__BB__)
+
 void RTC_Init(struct tm *dateTime){
 	RTC_PowerUp();
 	LPC_RTC->CCR = 2;	// stop clock and reset
 	LPC_RTC->ILR = 3;
 	LPC_RTC->CIIR = 0; /* Counter Increment Interrupt Disable */
 	RTC_DeactivateAlarm(RTC_AMR_OFF);
-	RTC_SetValue(dateTime);
+	if(dateTime)
+		RTC_SetValue(dateTime);
+	LPC_RTC->CCR = RTC_CLKEN;
 }
 
 void RTC_GetValue(struct tm *dateTime){

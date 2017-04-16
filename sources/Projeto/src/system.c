@@ -63,5 +63,5 @@ void SYS_Init(void){
 
     LCD_SetColors(GREEN,BLACK);
         
-    RTC_Init((struct tm*)&defaultRtc); //dummy value, rtc value is restored from flash
+    RTC_Init(0); //dummy value, rtc value is restored from flash
 }

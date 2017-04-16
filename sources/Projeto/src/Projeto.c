@@ -182,7 +182,7 @@ uint32_t button,res;
     
     restoreData(&saveddata,sizeof(SaveData));
     
-    RTC_SetValue(&saveddata.rtc);
+    //RTC_SetValue(&saveddata.rtc);
     
     state = switchTo(IDLE);
     

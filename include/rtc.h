@@ -46,7 +46,7 @@
 * @brief Faz a iniciação do sistema para permitir o acesso ao periférico RTC.
 *        O RTC é iniciado com os valores do parâmetro.
 **/
-void RTC_Init(struct tm *dateTime); 	 
+void RTC_Init(struct tm *dateTime);
 
 /** 
 * @brief Devolve em dateTime o valor corrente do RTC.
