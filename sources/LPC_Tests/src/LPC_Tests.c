@@ -52,7 +52,9 @@ int main(void) {
 
 	BUTTON_Init(BUTTON_DEFAULT_HOLD_TIME);
 
-	EEprom_Test();
+	//EEprom_Test();
+
+	PWM_TestInit();
 
 	// Force the counter to be placed into memory
 
@@ -60,6 +62,7 @@ int main(void) {
 	while(1) {
 		BUTTON_Hit();
 		//Button_Test();
+		PWM_Test();
 
 	}
 
