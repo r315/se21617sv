@@ -13,6 +13,7 @@
 #endif
 
 #include <cr_section_macros.h>
+#include <stdio.h>
 
 #include <spi.h>
 #include <lcd.h>
@@ -20,10 +21,8 @@
 #include <gpio.h>
 #include <led.h>
 #include <button.h>
-
-#include <stdio.h>
-
 #include <eeprom.h>
+#include <eth.h>
 
 
 void Button_Test(void);
@@ -44,7 +43,7 @@ int main(void) {
 	LCD_Rect(20,20,100,100,RED);
 
 	LCD_SetColors(BLUE,YELLOW);
-	LCD_WriteString("Hello");
+	LCD_WriteString("Hello\n");
 
 	TIME_DelayMs(2000);
 
@@ -54,7 +53,11 @@ int main(void) {
 
 	//EEprom_Test();
 
-	PWM_TestInit();
+	//PWM_TestInit();
+
+	ETH_Init();
+
+	LCD_WriteInt(ETH_GetPHY_ID(),16);
 
 	// Force the counter to be placed into memory
 
@@ -62,8 +65,8 @@ int main(void) {
 	while(1) {
 		BUTTON_Hit();
 		//Button_Test();
-		PWM_Test();
-
+		//PWM_Test();
+		TIME_DelayMs(100);
 	}
 
 	return 0 ;
