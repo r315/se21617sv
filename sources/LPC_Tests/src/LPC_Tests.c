@@ -28,16 +28,30 @@
 void Button_Test(void);
 void EEprom_Test(void);
 
-int main(void) {
+void TEST_Init(void){
+
 	TIME_Init();
+
 #ifdef __BB__
 	LCD_Init();
 #else
 	SPI_Init(100000,SPI_8BIT);
+
 	LCD_Init();
+
 	SPI_Init(6000000,SSP_16BIT);
 #endif
 
+	LED_Init(LED,LED_OFF);
+
+	BUTTON_Init(BUTTON_DEFAULT_HOLD_TIME);
+
+	ETH_Init();
+}
+
+int main(void) {
+
+	TEST_Init();
 	LCD_Clear(BLUE);
 
 	LCD_Rect(20,20,100,100,RED);
@@ -45,17 +59,9 @@ int main(void) {
 	LCD_SetColors(BLUE,YELLOW);
 	LCD_WriteString("Hello\n");
 
-	TIME_DelayMs(2000);
-
-	LED_Init(LED,LED_OFF);
-
-	BUTTON_Init(BUTTON_DEFAULT_HOLD_TIME);
-
 	//EEprom_Test();
 
 	//PWM_TestInit();
-
-	ETH_Init();
 
 	LCD_WriteInt(ETH_GetPHY_ID(),16);
 
@@ -66,7 +72,8 @@ int main(void) {
 		BUTTON_Hit();
 		//Button_Test();
 		//PWM_Test();
-		TIME_DelayMs(100);
+		ETH_Test();
+		TIME_DelayMs(1000);
 	}
 
 	return 0 ;

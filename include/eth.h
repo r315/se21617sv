@@ -48,9 +48,40 @@
 	LPC_PINCON->PINSEL3 |=  ((1<<ENET_MDC) | (1<<ENET_MDIO));
 
 #define ETH_MAC 0x038652201704
-#define ETH_RX_ALL_FRAMES (1<<1)
+//MAC1 Register bits
+#define MAC1_RCV_EN     	(1<<1)
+#define MAC1_PASS_ALL		(1<<1)
+#define MAC1_RESET_TX 		(1<<8)
+#define MAC1_RESET_MCS_TX	(1<<9)
+#define MAC1_RESET_RX 		(1<<10)
+#define MAC1_RESET_MCS_RX	(1<<11)
+#define MAC1_RESET_SIM		(1<<14)
+#define MAC1_RESET_SOFT		(1<<15)
+
+#define MAC2_FULLDUPLEX		(1<<0)
+
+//Command Register bits
+#define CMD_RX_EN 			(1<<0)
+#define CMD_TX_EN			(1<<1)
+#define CMD_RESET_REG		(1<<3)
+#define CMD_RESET_TX		(1<<4)
+#define CMD_RESET_RX		(1<<5)
+#define CMD_PASSRUNFRAME	(1<<6)
+#define CMD_RMII			(1<<9)
+#define CMD_FULLDUPLEX		(1<<10)
+
+//MCFG Register bits
+#define MCFG_SCAN			(1<<0)
+#define MCFG_RESET_MII		(1<<15)
+#define MCFG_CK64			(0xF<<2)
+
+//Receive Filter Control bits
+#define RFC_BROADCAST 	(1<<1)
+#define RFC_PERFECT     (1<<5)
+
 
 /* EMAC Memory Buffer configuration for 16K Ethernet RAM. */
+
 #define NUM_RX_FRAG 4			/* Num.of RX Fragments 4*1536= 6.0kB */
 #define NUM_TX_FRAG 2			/* Num.of TX Fragments 3*1536= 4.6kB */
 #define ETH_FRAG_SIZE 1536		/* Packet Fragment size 1536 Bytes */
@@ -64,19 +95,39 @@
 #define RX_BUF_BASE		(TX_STAT_BASE + NUM_TX_FRAG*4)
 #define TX_BUF_BASE		(RX_BUF_BASE + NUM_RX_FRAG*ETH_FRAG_SIZE)
 
+typedef struct _Desc{
+	void *packet;
+	uint32_t control;
+}EMAC_Descriptor;
 
-/* Serial Management Interface */
-#define PHY_DEF_ADR 1
+typedef struct _RxStatus{
+	uint32_t info;
+	uint32_t crc;
+}EMAC_RxStatus;
+
+typedef struct _TxStatus{
+	uint32_t info;
+}EMAC_TxStatus;
+
+typedef struct _ETHBuf{
+	uint8_t data[ETH_FRAG_SIZE];
+}EMAC_Buffer;
+
+/* Serial Management Interface Registers*/
+#define LAN8720_ID  0x0007C0F0
+#define PHY_ADR     0x100
 #define MCMD_READ   1
 #define MIND_BUSY   1
-#define SMI_CR		0	//Control Register
-#define SMI_SR		1	//Status Register
-#define SMI_ID1		2	//PHY ID1
-#define SMI_ID2		3   //PHY ID2
+#define PHY_CR		0	//Control Register
+#define PHY_SR		1	//Status Register
+#define PHY_ID1		2	//PHY ID1
+#define PHY_ID2		3   //PHY ID2
+#define PHY_10Mbit  0x100 //10Mbit Full duplex
 
-#define SMI_RESET	0x8000
+/* Serial Management Interface bits*/
+#define PHY_RESET	0x8000
 
-
+#define PHY_REG_TOUT 100
 
 /**
 * @brief Faz a iniciação do controlador de Ethernet, incluindo a camada PHY
@@ -85,10 +136,21 @@
 void ETH_Init();
 
 /**
-* @brief
+* @brief send packet through ethernet
+* @return send result
 */
-void ETH_Send();
+uint8_t ETH_Send(void *packet, uint32_t size);
 
-uint16_t ETH_GetPHY_ID(void);
+/**
+* @brief get packet through ethernet
+* @return size of packet
+*/
+uint32_t ETH_Read(void *packet);
+
+/**
+* @brief get PHY ID
+* @return id
+*/
+uint32_t ETH_GetPHY_ID(void);
 
 #endif
