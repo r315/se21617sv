@@ -6,6 +6,51 @@ EMAC_RxStatus *rxstatus;
 EMAC_TxStatus *txstatus;
 EMAC_Buffer *rxbuf, *txbuf;
 
+uint32_t ETH_Read(void *packet){
+	uint32_t size, Index = LPC_EMAC->RxConsumeIndex;
+
+	if(Index == LPC_EMAC->RxProduceIndex)
+		return(0); 										// no new data
+
+	size = (rxstatus[Index].info & 0x7FF) + 1;			//get packet size from status
+	if (size > ETH_FRAG_SIZE)size = ETH_FRAG_SIZE;		//clip size if bigger than fragment
+
+	memcpy(packet,(unsigned int *)&rxbuf[Index],size);	//copy packet data
+
+	if(++Index > LPC_EMAC->RxDescriptorNumber)			//point to next descriptor
+		Index = 0;
+
+	LPC_EMAC->RxConsumeIndex = Index;
+
+	return size;
+}
+
+
+uint8_t ETH_Send(void *packet, uint32_t size){
+	uint32_t Index, IndexNext = LPC_EMAC->TxProduceIndex + 1;
+
+	if(size == 0)
+		return 1;										//no data to be sent
+
+	if(IndexNext > LPC_EMAC->TxDescriptorNumber)		//point to descriptor
+		IndexNext = 0;
+
+	if(IndexNext == LPC_EMAC->TxConsumeIndex)
+		return 0;										//fail buffer is full
+
+	Index = LPC_EMAC->TxProduceIndex;
+	if (size > ETH_FRAG_SIZE)							//clip size
+		size = ETH_FRAG_SIZE;
+
+	memcpy((unsigned int *)&txbuf[Index],packet,size);  //this can be optimize by changing the descriptor pointer to data
+	txdescriptor[Index].control &= ~0x7FF;
+	txdescriptor[Index].control |= (size-1)&0x7FF;
+
+	LPC_EMAC->TxProduceIndex = IndexNext;
+
+	return 1;
+}
+
 
 unsigned short ETH_ReadPHY (unsigned char reg){
 	unsigned int tout = PHY_REG_TOUT;
@@ -40,6 +85,13 @@ void ETH_WritePHY (int reg, int writeval){
 	}
 }
 
+uint32_t ETH_GetPHY_ID(void){
+uint32_t id;
+	id = ETH_ReadPHY(PHY_ID1);
+	id <<=16;
+	id |= ETH_ReadPHY(PHY_ID2);
+	return id;
+}
 
 void ETH_Init(void){
 uint8_t i;
@@ -112,63 +164,4 @@ uint8_t i;
 	LPC_EMAC->Command |= CMD_RX_EN | CMD_RX_EN;
 	LPC_EMAC->MAC1 |= MAC1_RCV_EN;
 
-}
-
-uint32_t ETH_GetPHY_ID(void){
-uint32_t id;
-	id = ETH_ReadPHY(PHY_ID1);
-	id <<=16;
-	id |= ETH_ReadPHY(PHY_ID2);
-	return id;
-}
-
-uint32_t EMAC_Read(void *packet)
-{
-	uint32_t Index = LPC_EMAC->RxConsumeIndex;
-	uint32_t size;
-
-  if(Index == LPC_EMAC->RxProduceIndex) return(0);
-
-  size = (RX_STAT_INFO(Index) & 0x7ff)+1;
-  if (size > ETH_FRAG_SIZE)
-  	size = ETH_FRAG_SIZE;
-
-  memcpy(packet,(unsigned int *)RX_BUF(Index),size);
-
-  if(++Index > LPC_EMAC->RxDescriptorNumber)
-  {
-    Index = 0;
-  }
-  LPC_EMAC->RxConsumeIndex = Index;
-
-  return size;
-}
-
-
-uint8_t ETH_Send(void *packet, uint32_t size)
-{
-	uint32_t Index;
-	uint32_t IndexNext = LPC_EMAC->TxProduceIndex + 1;
-
-  if(size == 0)return 1;
-
-  if(IndexNext > LPC_EMAC->TxDescriptorNumber) {
-    IndexNext = 0;
-  }
-
-  if(IndexNext == LPC_EMAC->TxConsumeIndex){
-    return 0;
-  }
-
-  Index = LPC_EMAC->TxProduceIndex;
-  if (size > ETH_FRAG_SIZE)
-  	size = ETH_FRAG_SIZE;
-
-  //memcpy((unsigned int *)TX_BUF(Index),packet,size);
-  //TX_DESC_CTRL(Index) &= ~0x7ff;
-  //TX_DESC_CTRL(Index) |= (size - 1) & 0x7ff;
-
-  LPC_EMAC->TxProduceIndex = IndexNext;
-
-  return 1;
 }

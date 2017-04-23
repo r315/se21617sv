@@ -27,6 +27,7 @@
 
 void Button_Test(void);
 void EEprom_Test(void);
+void ETH_Test(void);
 
 void TEST_Init(void){
 
