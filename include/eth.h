@@ -59,6 +59,8 @@
 #define MAC1_RESET_SOFT		(1<<15)
 
 #define MAC2_FULLDUPLEX		(1<<0)
+#define MAC2_CRC_EN         (1<<4)
+#define MAC2_PAD_EN         (1<<5)
 
 //Command Register bits
 #define CMD_RX_EN 			(1<<0)
@@ -66,7 +68,8 @@
 #define CMD_RESET_REG		(1<<3)
 #define CMD_RESET_TX		(1<<4)
 #define CMD_RESET_RX		(1<<5)
-#define CMD_PASSRUNFRAME	(1<<6)
+#define CMD_PASS_RUNT_FRM   (1<<6)
+#define CMD_PASS_RX_FILT    (1<<7)
 #define CMD_RMII			(1<<9)
 #define CMD_FULLDUPLEX		(1<<10)
 
@@ -79,14 +82,29 @@
 #define RFC_BROADCAST 	(1<<1)
 #define RFC_PERFECT     (1<<5)
 
+//Interrupt Eanble Register
+#define INT_RX_DONE (1<<3)
+#define INT_TX_DONE (1<<7)
+
+/* Collision Window/Retry Register */
+#define CLRT_DEF            0x0000370F  /* Default value                     */
+/* Non Back-to-Back Inter-Packet-Gap Register */
+#define IPGR_DEF            0x00000012  /* Recommended value                 */
+/* PHY Support Register */
+#define SUPP_SPEED          0x00000100  /* Reduced MII Logic Current Speed   */
+/* Back-to-Back Inter-Packet-Gap Register */
+#define IPGT_FULL_DUP       0x00000015  /* Recommended value for Full Duplex */
+#define IPGT_HALF_DUP       0x00000012  /* Recommended value for Half Duplex */
+#define RCTRL_SIZE          0x000007FF  /* Buffer size mask                  */
+#define RCTRL_INT           0x80000000  /* Generate RxDone Interrupt         */
 
 /* EMAC Memory Buffer configuration for 16K Ethernet RAM. */
 
 #define NUM_RX_FRAG 4			/* Num.of RX Fragments 4*1536= 6.0kB */
 #define NUM_TX_FRAG 2			/* Num.of TX Fragments 3*1536= 4.6kB */
 #define ETH_FRAG_SIZE 1536		/* Packet Fragment size 1536 Bytes */
-
 #define ETH_MAX_FLEN 1536		/* Max. Ethernet Frame Size */
+
 /* EMAC variables located in AHB SRAM bank 1 */
 #define RX_DESC_BASE 	0x2007C000						//RamAHB32
 #define RX_STAT_BASE	(RX_DESC_BASE + NUM_RX_FRAG*8)
@@ -118,11 +136,18 @@ typedef struct _ETHBuf{
 #define PHY_ADR     0x100
 #define MCMD_READ   1
 #define MIND_BUSY   1
+
 #define PHY_CR		0	//Control Register
 #define PHY_SR		1	//Status Register
-#define PHY_ID1		2	//PHY ID1
-#define PHY_ID2		3   //PHY ID2
-#define PHY_10Mbit  0x100 //10Mbit Full duplex
+#define PHY_ID1		2	//PHY ID1 Register
+#define PHY_ID2		3   //PHY ID2 Register
+#define PHY_10Mbit   //10Mbit Full duplex
+#define PHY_AUTO_NEGOTIATE 0x3000
+//Status register bits
+#define PHY_LINK         (1<<2)
+#define PHY_AN_COMPLETED (1<<5)
+#define PHY_10FD		 (1<<12)
+#define PHY_100FD		 (1<<14)
 
 /* Serial Management Interface bits*/
 #define PHY_RESET	0x8000

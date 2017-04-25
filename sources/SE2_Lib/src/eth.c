@@ -6,6 +6,10 @@ EMAC_RxStatus *rxstatus;
 EMAC_TxStatus *txstatus;
 EMAC_Buffer *rxbuf, *txbuf;
 
+uint8_t ETH_HasFrame(void){
+	return LPC_EMAC->RxProduceIndex != LPC_EMAC->RxConsumeIndex;
+}
+
 uint32_t ETH_Read(void *packet){
 	uint32_t size, Index = LPC_EMAC->RxConsumeIndex;
 
@@ -93,39 +97,9 @@ uint32_t id;
 	return id;
 }
 
-void ETH_Init(void){
-uint8_t i;
-
-	LPC_SC->PCONP |= ETH_ON;
-	ETH_ConfigPins();
-
-	//Reset everything
-	LPC_EMAC->MAC1 =  MAC1_RESET_TX | MAC1_RESET_MCS_TX	| MAC1_RESET_RX | MAC1_RESET_MCS_RX | MAC1_RESET_SIM | MAC1_RESET_SOFT;
-	LPC_EMAC->Command = CMD_RESET_TX | CMD_RESET_RX | CMD_RESET_REG | CMD_PASSRUNFRAME;
-	LPC_EMAC->MCFG = MCFG_RESET_MII;
-	TIME_DelayMs(5);
-
-	LPC_EMAC->MAC1 = MAC1_PASS_ALL;
-	LPC_EMAC->MCFG = MCFG_CK64;		//MII Clock = CCLK/64
-
-	LPC_EMAC->Command = CMD_RMII;   //Enable MII
-
-	//Configure PHY
-	ETH_WritePHY(PHY_CR,PHY_RESET);
-	TIME_DelayMs(10);
-
-	ETH_WritePHY(PHY_CR, PHY_10Mbit); //configure PHY to 10Mbit full duplex
-
-	//	ETH_WritePHY(PHY_CR, PHY_10Mbit); //auto negotiate
-
-	LPC_EMAC->MAC2 |= MAC2_FULLDUPLEX;
-	LPC_EMAC->Command |= CMD_FULLDUPLEX;
-	LPC_EMAC->SUPP = 0;                  //Config 10Mbit
-
-	LPC_EMAC->SA2 = ETH_MAC >> 32;		 //Config MAC address
-	LPC_EMAC->SA1 = ETH_MAC >> 16;
-	LPC_EMAC->SA0 = ETH_MAC & 0xFFFF;
-
+void ETH_InitDescriptors(void){
+	uint32_t i;
+	//Initialize Descriptors
 	rxdescriptor = (EMAC_Descriptor*)RX_DESC_BASE;
 	rxstatus     = (EMAC_RxStatus*)RX_STAT_BASE;
 	txdescriptor = (EMAC_Descriptor*)TX_DESC_BASE;
@@ -135,15 +109,9 @@ uint8_t i;
 
 	for(i = 0; i < NUM_RX_FRAG; i++){
 		rxdescriptor[i].packet = &rxbuf[i];
-		rxdescriptor[i].control = 0;
+		rxdescriptor[i].control = RCTRL_INT | (ETH_FRAG_SIZE - 1);
 		rxstatus[i].info = 0;
 		rxstatus[i].crc = 0;
-	}
-
-	for(i = 0; i < NUM_TX_FRAG; i++){
-		txdescriptor[i].packet  = &txbuf[i];
-		txdescriptor[i].control = (1<<31) | (1<<30) | (1<<29) | (1<<28) | (1<<26) | (ETH_FRAG_SIZE - 1);
-		txstatus[i].info = 0;
 	}
 
 	LPC_EMAC->RxDescriptor = RX_DESC_BASE;
@@ -151,17 +119,86 @@ uint8_t i;
 	LPC_EMAC->RxDescriptorNumber = NUM_RX_FRAG - 1;
 	LPC_EMAC->RxConsumeIndex = 0;
 
+	for(i = 0; i < NUM_TX_FRAG; i++){
+		txdescriptor[i].packet  = &txbuf[i];
+		txdescriptor[i].control = 0;
+		txstatus[i].info = 0;
+	}
+
 	LPC_EMAC->TxDescriptor = TX_DESC_BASE;
 	LPC_EMAC->TxStatus = TX_STAT_BASE;
 	LPC_EMAC->TxDescriptorNumber = NUM_TX_FRAG - 1;
 	LPC_EMAC->TxProduceIndex = 0;
+}
+
+void ETH_InitPHY(void){
+	uint32_t poll;
+	uint16_t phystatus;
+
+	ETH_WritePHY(PHY_CR, PHY_RESET);
+	TIME_DelayMs(10);
+
+	poll = 0;
+	ETH_WritePHY(PHY_CR, PHY_AUTO_NEGOTIATE); //set auto negotiate
+	while(!(phystatus & (PHY_AN_COMPLETED | PHY_LINK)) && poll < 10000){
+		phystatus = ETH_ReadPHY(PHY_SR);
+		poll++;
+	}
+
+	printf("Status 0x%x",phystatus);
+
+	if(phystatus & PHY_AN_COMPLETED){
+		 if ( (phystatus & PHY_100FD) || (phystatus & PHY_10FD) ) {
+			  //full duplex mode
+			  LPC_EMAC->MAC2    |= MAC2_FULLDUPLEX;
+			  LPC_EMAC->Command |= CMD_FULLDUPLEX;
+			  LPC_EMAC->IPGT     = IPGT_FULL_DUP;
+		  }
+		  else {
+			  //half duplex mode
+			  LPC_EMAC->IPGT = IPGT_HALF_DUP;
+		  }
+		 // select 100/10Mbit
+		 LPC_EMAC->SUPP = (phystatus & PHY_100FD) ? SUPP_SPEED : 0;
+	}
+
+	//Configure Ethernet physical address
+	LPC_EMAC->SA2 = ETH_MAC >> 32;		 //Config MAC address
+	LPC_EMAC->SA1 = ETH_MAC >> 16;
+	LPC_EMAC->SA0 = ETH_MAC & 0xFFFF;
+}
+
+void ETH_Init(void){
+
+
+	LPC_SC->PCONP |= ETH_ON;
+	ETH_ConfigPins();
+
+	//Reset everything
+	LPC_EMAC->MAC1 =  MAC1_RESET_TX | MAC1_RESET_MCS_TX	| MAC1_RESET_RX | MAC1_RESET_MCS_RX | MAC1_RESET_SIM | MAC1_RESET_SOFT;
+	LPC_EMAC->Command = CMD_RESET_TX | CMD_RESET_RX | CMD_RESET_REG | CMD_PASS_RUNT_FRM;
+
+	//
+	LPC_EMAC->MAC1 = MAC1_PASS_ALL;
+	LPC_EMAC->MAC2 = MAC2_CRC_EN | MAC2_PAD_EN;
+
+	LPC_EMAC->MAXF = ETH_MAX_FLEN;
+	LPC_EMAC->CLRT = CLRT_DEF;
+	LPC_EMAC->IPGR = IPGR_DEF;
+
+	LPC_EMAC->MCFG = MCFG_RESET_MII;
+	TIME_DelayMs(5);
+	LPC_EMAC->MCFG = MCFG_CK64;		//MII Clock = CCLK/64
+
+	LPC_EMAC->Command = CMD_RMII | CMD_PASS_RUNT_FRM | CMD_PASS_RX_FILT;
+
+	ETH_InitPHY();
+	ETH_InitDescriptors();
 
 	LPC_EMAC->RxFilterCtrl = RFC_BROADCAST | RFC_PERFECT;
-
-	//LPC_EMAC->IntEnable = INT_RX_DONE | INT_TX_DONE;
+	LPC_EMAC->IntEnable = INT_RX_DONE | INT_TX_DONE;
 	LPC_EMAC->IntClear  = 0xFFFF;
 
-	LPC_EMAC->Command |= CMD_RX_EN | CMD_RX_EN;
+	LPC_EMAC->Command |= CMD_RX_EN | CMD_TX_EN;
 	LPC_EMAC->MAC1 |= MAC1_RCV_EN;
-
 }
