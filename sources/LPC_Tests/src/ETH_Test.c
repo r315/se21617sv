@@ -1,25 +1,44 @@
 #include <eth.h>
 
+uint8_t arp[]={
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x08, 0x06, 0x00, 0x01,
+		0x08, 0x00, 0x06, 0x04, 0x00, 0x01, 0xd0, 0x27, 0x88, 0x0c, 0x25, 0x73, 0xc0, 0xa8, 0x00, 0xC8,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0xa8, 0x00, 0x02};
+
 uint8_t msg[]={0xD0,0x27,0x88,0x0C,0x25,0x73,0xAA,0x55,0xAA,0x55,0xAA,0x55,0x08,0x00};
 uint8_t pk[ETH_FRAG_SIZE];
 
+void swapBytes(uint8_t *dst, uint8_t *src, uint32_t size){
+uint8_t tmp;
+	while(size--){
+		tmp = *dst;
+		*dst = *src;
+		*src = tmp;
+		src+=1;
+		dst += 1;
+	}
+}
 
 void ETH_PrintPacket(void *pk, uint32_t len){
-uint32_t i;
-    while(len){
-        printf("%4X:",i);
-        for(i=0; i < 16 && len > 0;i++){
-            printf(" %X",pk++);
-            len--;
-        }
-        printf("\n");
+    while(len--){
+        printf(" %.2X",*((uint8_t*)(pk++)));
     }
+    printf("\n");
 }
 
 void ETH_Test(void){
-
-	ETH_Send(msg, sizeof(msg));
-	if(ETH_Read(pk))
-		ETH_PrintPacket(pk,16);
+uint32_t size;
+	ETH_Send(arp,sizeof(arp));
+	size = ETH_Read(pk);
+	if(size){
+		if(pk[14] == 0x45)  //IP header
+		{
+			swapBytes( pk, pk+6, 6);     // MAC
+			swapBytes( pk+26, pk+30, 4); // ip
+			ETH_Send(pk,size);
+			printf("ping reply\n");
+		}else
+			ETH_PrintPacket(pk,16);
+	}
 
 }

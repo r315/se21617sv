@@ -129,29 +129,33 @@ void ETH_InitDescriptors(void){
 	LPC_EMAC->TxStatus = TX_STAT_BASE;
 	LPC_EMAC->TxDescriptorNumber = NUM_TX_FRAG - 1;
 	LPC_EMAC->TxProduceIndex = 0;
-}
+ }
 
 void ETH_InitPHY(void){
-	uint32_t poll;
+	uint32_t loop;
 	uint16_t phystatus;
 
 	ETH_WritePHY(PHY_CR, PHY_RESET);
-	TIME_DelayMs(10);
 
-	poll = 0;
-	ETH_WritePHY(PHY_CR, PHY_AUTO_NEGOTIATE); //set auto negotiate
-	while(!(phystatus & (PHY_AN_COMPLETED | PHY_LINK)) && poll < 10000){
+	phystatus = loop = 0;
+	do{
 		phystatus = ETH_ReadPHY(PHY_SR);
-		poll++;
-	}
+		loop++;
+	}while((phystatus & PHY_RESET) && loop < 0x100);
 
-	printf("Status 0x%x",phystatus);
+	loop = 0;
+	ETH_WritePHY(PHY_CR, PHY_AUTO_NEGOTIATE); //set auto negotiate
+
+	while(!(phystatus & (PHY_AN_COMPLETED | PHY_LINK)) && loop < 10000){
+		phystatus = ETH_ReadPHY(PHY_SR);
+		loop++;
+	}
 
 	if(phystatus & PHY_AN_COMPLETED){
 		 if ( (phystatus & PHY_100FD) || (phystatus & PHY_10FD) ) {
 			  //full duplex mode
-			  LPC_EMAC->MAC2    |= MAC2_FULLDUPLEX;
-			  LPC_EMAC->Command |= CMD_FULLDUPLEX;
+			  LPC_EMAC->MAC2    |= MAC2_FULL_DUP;
+			  LPC_EMAC->Command |= CMD_FULL_DUP;
 			  LPC_EMAC->IPGT     = IPGT_FULL_DUP;
 		  }
 		  else {
@@ -161,16 +165,9 @@ void ETH_InitPHY(void){
 		 // select 100/10Mbit
 		 LPC_EMAC->SUPP = (phystatus & PHY_100FD) ? SUPP_SPEED : 0;
 	}
-
-	//Configure Ethernet physical address
-	LPC_EMAC->SA2 = ETH_MAC >> 32;		 //Config MAC address
-	LPC_EMAC->SA1 = ETH_MAC >> 16;
-	LPC_EMAC->SA0 = ETH_MAC & 0xFFFF;
 }
 
 void ETH_Init(void){
-
-
 	LPC_SC->PCONP |= ETH_ON;
 	ETH_ConfigPins();
 
@@ -193,7 +190,13 @@ void ETH_Init(void){
 	LPC_EMAC->Command = CMD_RMII | CMD_PASS_RUNT_FRM | CMD_PASS_RX_FILT;
 
 	ETH_InitPHY();
+
 	ETH_InitDescriptors();
+
+	//Configure Ethernet physical address
+	LPC_EMAC->SA2 = 0x0506;//IF_MAC >> 32;		 //Config MAC address
+	LPC_EMAC->SA1 = 0x0304;//IF_MAC >> 16;
+	LPC_EMAC->SA0 = 0x0102;//IF_MAC & 0xFFFF;
 
 	LPC_EMAC->RxFilterCtrl = RFC_BROADCAST | RFC_PERFECT;
 	LPC_EMAC->IntEnable = INT_RX_DONE | INT_TX_DONE;

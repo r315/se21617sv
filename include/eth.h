@@ -25,8 +25,9 @@
  *	GS1,GS2 	GND
  */
 
-#define PCENET 30
-#define ETH_ON (1<<PCENET)
+#define IF_MAC 0x038652201704
+
+#define ETH_ON (1<<30)
 
 #define ENET_TXD0	0		//P1.0
 #define ENET_TXD1	2		//P1.1
@@ -47,9 +48,8 @@
 							| (1<<ENET_RXD0) | (1<<ENET_RXD1) | (1<<ENET_RX_ER) | (1<<ENET_REF_CLK)); \
 	LPC_PINCON->PINSEL3 |=  ((1<<ENET_MDC) | (1<<ENET_MDIO));
 
-#define ETH_MAC 0x038652201704
 //MAC1 Register bits
-#define MAC1_RCV_EN     	(1<<1)
+#define MAC1_RCV_EN     	(1<<0)
 #define MAC1_PASS_ALL		(1<<1)
 #define MAC1_RESET_TX 		(1<<8)
 #define MAC1_RESET_MCS_TX	(1<<9)
@@ -58,7 +58,7 @@
 #define MAC1_RESET_SIM		(1<<14)
 #define MAC1_RESET_SOFT		(1<<15)
 
-#define MAC2_FULLDUPLEX		(1<<0)
+#define MAC2_FULL_DUP		(1<<0)
 #define MAC2_CRC_EN         (1<<4)
 #define MAC2_PAD_EN         (1<<5)
 
@@ -71,7 +71,7 @@
 #define CMD_PASS_RUNT_FRM   (1<<6)
 #define CMD_PASS_RX_FILT    (1<<7)
 #define CMD_RMII			(1<<9)
-#define CMD_FULLDUPLEX		(1<<10)
+#define CMD_FULL_DUP		(1<<10)
 
 //MCFG Register bits
 #define MCFG_SCAN			(1<<0)
