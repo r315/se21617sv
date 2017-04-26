@@ -34,7 +34,7 @@
 
 enum gStates{
     RUNNING,
-    END,
+    ENDED,
     SELECT
 };
 
