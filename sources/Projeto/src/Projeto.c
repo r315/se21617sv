@@ -58,7 +58,7 @@ State switchTo(State newState){
  /**
   * @brief if score is a top score insert it on scores table.
   * @param score: score of last game
-  * @param scorestab: ponter to array contining the 3 best scores
+  * @param scorestab: ponter to array containing the 3 best scores
   * */
 void saveTopScore(uint32_t score, uint32_t *scorestab){
 uint8_t n;
@@ -184,6 +184,8 @@ uint32_t button,res;
     
     //RTC_SetValue(&saveddata.rtc);
     
+    LCD_SetColors(GREEN,BLACK);
+
     state = switchTo(IDLE);
     
     //printf("PRJ: SaveData Size: %u Bytes\n",sizeof(SaveData));
@@ -271,7 +273,10 @@ uint32_t button,res;
             	displaySaveResult(0x30);
                 LED_SetState(LED_ON);
                 //printf("Score: %u\n",saveddata.spaceInvaders.score);
+                // check if last score is top and insert it on table
                 saveTopScore(saveddata.spaceInvaders.score, saveddata.topscores);
+                // update gamedata with top score
+                saveddata.spaceInvaders.topscore = saveddata.topscores[0];
 
                 saveddata.checksum = generateChecksum(&saveddata.spaceInvaders, sizeof(GameData));
 

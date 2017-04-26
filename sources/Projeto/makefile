@@ -16,7 +16,7 @@ LDSCRIPT_RAM= -T ../../bsp/ldscript_ram
 TARGET = project
 LIBTARGET =
 
-OBJS = init.o $(TARGET).o system.o save.o idle.o config.o space.o sprites/sprites.o
+OBJS = init.o $(TARGET).o startup.o save.o idle.o config.o space.o sprites/sprites.o
 
 SYMBOLS =
 LIBS = -lled -ltimer -lbutton -lrtc -lclock -lspi -llcd -lflash -lgcc -lc
@@ -63,7 +63,7 @@ XINCPATH =../../include ../emulator inc
 XLIBPATH =../emulator
 
 #XSRCS =$(foreach sdir,$(XSRCPATH),$(wildcard $(sdir)/*.c))
-XSRCSF =config.c idle.c Projeto.c save.c system.c space.c rand.c
+XSRCSF =config.c idle.c Projeto.c save.c startup.c space.c rand.c
 XSRCS =$(addprefix $(XSRCPATH)/, $(XSRCSF)) sprites/sprites.c 
 XOBJS = $(addprefix $(XOBJPATH)/,$(notdir $(XSRCS:.c=.obj)))
 
