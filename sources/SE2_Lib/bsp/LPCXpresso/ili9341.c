@@ -138,6 +138,6 @@ void LCD_Init(void){
         TIME_DelayMs(120);
         LCD_Command(RAMWR);  
 
-        LCD_BKL1; 
+        //LCD_BKL1;
 }
 
