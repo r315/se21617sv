@@ -14,6 +14,10 @@ void EEPROM_Init(void){
 	I2C_Init((I2C_Controller*)&eeprom, EEPROM_INTERFACE, I2C_DEFAULT_CLOCK , EEPROM_CONTROL_BYTE);
 }
 
+uint8_t EEPROM_GetIfNumber(void){
+	return EEPROM_INTERFACE;
+}
+
 /**
  * @brief this state machine dedicated to process eeprom write and read sequences
  * Write  |S| dev+W | MSB | LSB | data | data+n |P|

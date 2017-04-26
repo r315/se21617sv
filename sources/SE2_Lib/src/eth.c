@@ -1,14 +1,11 @@
 #include <eth.h>
+#include <string.h>
 #include <time_m3.h>
 
 EMAC_Descriptor *rxdescriptor, *txdescriptor;
 EMAC_RxStatus *rxstatus;
 EMAC_TxStatus *txstatus;
 EMAC_Buffer *rxbuf, *txbuf;
-
-uint8_t ETH_HasFrame(void){
-	return LPC_EMAC->RxProduceIndex != LPC_EMAC->RxConsumeIndex;
-}
 
 uint32_t ETH_Read(void *packet){
 	uint32_t size, Index = LPC_EMAC->RxConsumeIndex;
@@ -90,11 +87,7 @@ void ETH_WritePHY (int reg, int writeval){
 }
 
 uint32_t ETH_GetPHY_ID(void){
-uint32_t id;
-	id = ETH_ReadPHY(PHY_ID1);
-	id <<=16;
-	id |= ETH_ReadPHY(PHY_ID2);
-	return id;
+	return (ETH_ReadPHY(PHY_ID1)<<16) | ETH_ReadPHY(PHY_ID2);
 }
 
 void ETH_InitDescriptors(void){
@@ -146,13 +139,13 @@ void ETH_InitPHY(void){
 	loop = 0;
 	ETH_WritePHY(PHY_CR, PHY_AUTO_NEGOTIATE); //set auto negotiate
 
-	while(!(phystatus & (PHY_AN_COMPLETED | PHY_LINK)) && loop < 10000){
+	while(!(phystatus & (PHY_AN_COMPLETED | PHY_LINK)) && loop < 50){
 		phystatus = ETH_ReadPHY(PHY_SR);
 		loop++;
 	}
 
 	if(phystatus & PHY_AN_COMPLETED){
-		 if ( (phystatus & PHY_100FD) || (phystatus & PHY_10FD) ) {
+		 if ( phystatus & (PHY_100FD | PHY_10FD) ) {
 			  //full duplex mode
 			  LPC_EMAC->MAC2    |= MAC2_FULL_DUP;
 			  LPC_EMAC->Command |= CMD_FULL_DUP;
@@ -176,16 +169,16 @@ void ETH_Init(void){
 	LPC_EMAC->Command = CMD_RESET_TX | CMD_RESET_RX | CMD_RESET_REG | CMD_PASS_RUNT_FRM;
 
 	//
-	LPC_EMAC->MAC1 = MAC1_PASS_ALL;
-	LPC_EMAC->MAC2 = MAC2_CRC_EN | MAC2_PAD_EN;
+	LPC_EMAC->MAC1 = MAC1_PASS_ALL;				//accept all frames on interface
+	LPC_EMAC->MAC2 = MAC2_CRC_EN | MAC2_PAD_EN; //generate CRC and padding
 
-	LPC_EMAC->MAXF = ETH_MAX_FLEN;
+	LPC_EMAC->MAXF = ETH_MAX_FLEN;				//Set frame size
 	LPC_EMAC->CLRT = CLRT_DEF;
 	LPC_EMAC->IPGR = IPGR_DEF;
 
 	LPC_EMAC->MCFG = MCFG_RESET_MII;
 	TIME_DelayMs(5);
-	LPC_EMAC->MCFG = MCFG_CK64;		//MII Clock = CCLK/64
+	LPC_EMAC->MCFG = MCFG_CK64;					//MII Clock, select divider for 2,5Mhx to 12Mhz
 
 	LPC_EMAC->Command = CMD_RMII | CMD_PASS_RUNT_FRM | CMD_PASS_RX_FILT;
 
@@ -194,14 +187,14 @@ void ETH_Init(void){
 	ETH_InitDescriptors();
 
 	//Configure Ethernet physical address
-	LPC_EMAC->SA2 = 0x0506;//IF_MAC >> 32;		 //Config MAC address
-	LPC_EMAC->SA1 = 0x0304;//IF_MAC >> 16;
-	LPC_EMAC->SA0 = 0x0102;//IF_MAC & 0xFFFF;
+	LPC_EMAC->SA2 = IF_MAC >> 32;
+	LPC_EMAC->SA1 = IF_MAC >> 16;
+	LPC_EMAC->SA0 = IF_MAC & 0xFFFF;
 
-	LPC_EMAC->RxFilterCtrl = RFC_BROADCAST | RFC_PERFECT;
-	LPC_EMAC->IntEnable = INT_RX_DONE | INT_TX_DONE;
+	LPC_EMAC->RxFilterCtrl = RFC_BROADCAST | RFC_PERFECT; 	//Filter only good packets ans broadcast
+	LPC_EMAC->IntEnable = INT_RX_DONE | INT_TX_DONE;	  	//Enable interrupts for dedicated DMA
 	LPC_EMAC->IntClear  = 0xFFFF;
 
-	LPC_EMAC->Command |= CMD_RX_EN | CMD_TX_EN;
-	LPC_EMAC->MAC1 |= MAC1_RCV_EN;
+	LPC_EMAC->Command |= CMD_RX_EN | CMD_TX_EN;			 	//enable send and receive
+	LPC_EMAC->MAC1 |= MAC1_RCV_EN;							//enable frame receive
 }
