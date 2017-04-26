@@ -1,6 +1,11 @@
 #ifndef _util_h_
 #define _util_h_
 
+#ifndef ON
+#define ON 1
+#define OFF 0
+#endif
+
 #if defined(__LPC17XX__)
 #include <time_m3.h>
 #define TIMER0_GetValue() TIME_GetValue()

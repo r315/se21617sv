@@ -9,9 +9,9 @@
 
 #ifndef _ETH_H_
 #define _ETH_H_
-
+#ifndef __EMU__
 #include <LPC17xx.h>
-
+#endif
 
 /**
  * Pinouts
@@ -158,7 +158,7 @@ typedef struct _ETHBuf{
 * @brief Faz a iniciação do controlador de Ethernet, incluindo a camada PHY
 *
 */
-void ETH_Init();
+void ETH_Init(void);
 
 /**
 * @brief send packet through ethernet
