@@ -68,6 +68,7 @@ enum Bevent{
 
 #define BUTTON_GetValue()  LPC_GPIO0->FIOPIN          //do not call this functions directly
 #define BUTTON_SetInput(x) LPC_GPIO0->FIODIR &= ~(x)
+
 #else
 /**
 * @brief Button connections
@@ -80,6 +81,8 @@ enum Bevent{
 #define BUTTON_R (1<<13)
 #define BUTTON_F (1<<12)
 #define BUTTON_S (1<<15)
+#define BUTTON_U (1<<16)
+#define BUTTON_D (1<<17)
 
 #define BUTTON_MASK (BUTTON_L | BUTTON_R | BUTTON_F | BUTTON_S)
 
