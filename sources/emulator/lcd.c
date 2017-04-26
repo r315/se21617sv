@@ -87,6 +87,25 @@ void LCD_Clear(int color){
 	LCD_Fill(LCD_SIZE, color);	
 }
 
+void LCD_Rect(uint16_t x, uint16_t y,  uint16_t w, uint16_t h, uint16_t color){
+    LCD_Window(x, y, w, 1);
+    LCD_Fill(w, color);
+
+	LCD_Window(x + w , y, 1, h+1);
+    LCD_Fill(h+1, color);
+
+	LCD_Window(x, y + h , w, 1);
+    LCD_Fill(w, color);
+
+	LCD_Window(x ,y ,1, h);
+    LCD_Fill(h, color);
+}
+
+void LCD_FillRect(uint16_t x, uint16_t y,  uint16_t w, uint16_t h, uint16_t color){
+    LCD_Window(x,y,w,h);
+    LCD_Fill(w * h, color);
+}
+
 void LCD_PutChar(char c, int x, int y, int fColor, int bColor) {
 	int i, colIndex;
 	unsigned int nCols;

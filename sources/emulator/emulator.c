@@ -50,7 +50,9 @@ uint32_t rtcinc(uint32_t interval, void*ptr){
       return interval;
 }
 
-void RTC_Init(struct tm *dateTime){ 
+void RTC_Init(struct tm *dateTime){
+	if(!dateTime)
+		return; 
    RTC_SetValue(dateTime);
    __amr = 0;
    SDL_AddTimer(1000, rtcinc,(void*)NULL);
@@ -124,10 +126,12 @@ Button __button;
 
 int BUTTON_Filter(const Uint8 *ink){
         __button.button = 0;
-        if(ink[SDL_SCANCODE_1])  __button.button |= BUTTON_L;
-        if(ink[SDL_SCANCODE_2])  __button.button |= BUTTON_F;
-        if(ink[SDL_SCANCODE_3])  __button.button |= BUTTON_R;
-        if(ink[SDL_SCANCODE_4])  __button.button |= BUTTON_S;
+        if(ink[SDL_SCANCODE_A])  __button.button |= BUTTON_L;
+        if(ink[SDL_SCANCODE_SPACE])  __button.button |= BUTTON_F;
+        if(ink[SDL_SCANCODE_D])  __button.button |= BUTTON_R;
+        if(ink[SDL_SCANCODE_E])  __button.button |= BUTTON_S;
+		if(ink[SDL_SCANCODE_W])  __button.button |= BUTTON_U;
+		if(ink[SDL_SCANCODE_S])  __button.button |= BUTTON_D;
         if(ink[SDL_SCANCODE_Q] || ink[SDL_SCANCODE_ESCAPE]) { __button.button = SDLK_q; __button.event = SDL_QUIT; }
         //printf("key pressed %u\n",__button);
 return __button.button;
@@ -237,7 +241,44 @@ unsigned int TIME_Elapsed(uint32_t lastRead){
 void TIME_DelayMs(uint32_t ms){
     SDL_Delay(ms);
 }
+//---------------------------------------------------------------------------
+uint8_t _eeprom[1024];
+void EEPROM_Init(void){
 
+}
+
+int8_t EEPROM_Write(uint16_t address, uint8_t *data, uint32_t size){
+	while(size--)
+		_eeprom[address++] = *data++;
+	return 0;
+}
+
+int8_t EEPROM_Read(uint16_t address, uint8_t *data, uint32_t size){
+	while(size--)
+		*data++ = _eeprom[address++];
+	return 0;
+}
+
+uint8_t EEPROM_GetIfNumber(void){
+	return 10;
+}
+
+//---------------------------------------------------------------------------
+
+void ETH_Init(void){
+}
+
+uint8_t ETH_Send(void *packet, uint32_t size){
+	return 0;
+}
+
+uint32_t ETH_Read(void *packet){
+ 	return 0;
+}
+
+uint32_t ETH_GetPHY_ID(void){
+	return 0;
+}
 
 
 

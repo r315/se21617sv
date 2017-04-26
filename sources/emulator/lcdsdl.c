@@ -26,7 +26,9 @@ struct LCD{
     uint32_t auto_update;
 }lcd;
 
+void LCD_Bkl(uint32_t state){
 
+}
 
 uint32_t LCD_Update(uint32_t interval, void *ptr){    
 /*    while(lcd.update){
