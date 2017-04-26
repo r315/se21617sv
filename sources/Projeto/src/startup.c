@@ -4,6 +4,8 @@
 #include <lcd.h>
 #include <rtc.h>
 #include <button.h>
+#include <eth.h>
+
 #if defined(__LPCX__)
 #include <eeprom.h>
 #include <spi.h>
@@ -57,11 +59,31 @@ void SYS_Init(void){
 
 	#endif
 
-	LED_Init(LED, LED_OFF);
+    LCD_Clear(BLACK);
+    LCD_Bkl(ON);
 
-    BUTTON_Init(BUTTON_DEFAULT_HOLD_TIME - 1500);
+	LCD_SetColors(YELLOW, BLACK);
+	LCD_WriteString("Hello\n");
 
-    LCD_SetColors(GREEN,BLACK);
-        
-    RTC_Init(0); //dummy value, rtc value is restored from flash
+	LED_Init(LED,LED_OFF);
+	LCD_WriteString("Led Initialized: OFF\n");
+
+	BUTTON_Init(500);
+	LCD_WriteString("Buttons Initialized: 500ms\n");
+
+	EEPROM_Init();
+	LCD_WriteString("EEPROM on I2C");
+	LCD_WriteInt(EEPROM_GetIfNumber(),10);
+	LCD_WriteChar('\n');
+
+
+
+	ETH_Init();
+	LCD_WriteString("ETH: MAC 06:05:04:03:02:01\n");
+	LCD_WriteString("ETH: PHY ID 0x");
+	LCD_WriteInt(ETH_GetPHY_ID(),16);
+	LCD_WriteChar('\n');
+
+	RTC_Init(0); //dummy value, rtc value is restored from flash
+	LCD_WriteString("RTC Initialized: NOT SET!\n");
 }
