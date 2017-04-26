@@ -30,7 +30,7 @@ void EEprom_Test(void);
 void ETH_Test(void);
 
 void TEST_Init(void){
-
+uint32_t id;
 	TIME_Init();
 
 #ifdef __BB__
@@ -43,38 +43,44 @@ void TEST_Init(void){
 	SPI_Init(6000000,SSP_16BIT);
 #endif
 
+	LCD_Clear(BLACK);
+	LCD_Rect(90,20,100,100,RED);
+	LCD_SetColors(YELLOW, BLACK);
+	LCD_WriteString("Hello\n");
+	LCD_Bkl(ON);
+
 	LED_Init(LED,LED_OFF);
+	LCD_WriteString("Led Initialized: OFF\n");
 
 	BUTTON_Init(BUTTON_DEFAULT_HOLD_TIME);
+	LCD_WriteString("Buttons Initialized: 2s\n");
+
+	EEPROM_Init();
+	LCD_WriteString("EEPROM on I2C");
+	LCD_WriteInt(EEPROM_GetIfNumber(),10);
+	LCD_WriteChar('\n');
 
 	ETH_Init();
+	LCD_WriteString("ETH: MAC 06:05:04:03:02:01\n");
+	LCD_WriteString("ETH: PHY ID 0x");
+	LCD_WriteInt(ETH_GetPHY_ID(),16);
+	LCD_WriteChar('\n');
 }
 
 int main(void) {
 
 	TEST_Init();
-	LCD_Clear(BLUE);
-
-	LCD_Rect(20,20,100,100,RED);
-
-	LCD_SetColors(BLUE,YELLOW);
-	LCD_WriteString("Hello\n");
 
 	//EEprom_Test();
 
 	//PWM_TestInit();
 
-	LCD_WriteInt(ETH_GetPHY_ID(),16);
-
-	// Force the counter to be placed into memory
-
-	// Enter an infinite loop, just incrementing a counter
 	while(1) {
 		BUTTON_Hit();
 		//Button_Test();
 		//PWM_Test();
 		ETH_Test();
-		TIME_DelayMs(1000);
+		TIME_DelayMs(100);
 	}
 
 	return 0 ;
