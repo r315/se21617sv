@@ -47,4 +47,9 @@ int8_t EEPROM_Write(uint16_t address, uint8_t *data, uint32_t size);
 **/
 int8_t EEPROM_Read(uint16_t address, uint8_t *data, uint32_t size);
 
+/*
+ * @brief Retorna o numero do interface i2c em uso (0-2)
+ */
+uint8_t EEPROM_GetIfNumber(void);
+
 #endif
