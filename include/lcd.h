@@ -105,6 +105,13 @@ uint8_t LCD_GetFontWidth(void);
 uint8_t LCD_GetFontHeight(void);
 
 /**
+ * @brief escreve n data no display, usado para preenchimentos
+ * 		rapidos de zonas. Uma janela de escrita deve de ser aberta
+ * 		antes da chamada a esta função
+ **/
+void LCD_Fill(uint32_t n, uint16_t data);
+
+/**
  * @brief Desenha um rectangulo cheio
  **/
 void LCD_FillRect(uint16_t x, uint16_t y,  uint16_t w, uint16_t h, uint16_t color);

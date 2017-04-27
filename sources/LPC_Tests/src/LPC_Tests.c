@@ -30,7 +30,6 @@ void EEprom_Test(void);
 void ETH_Test(void);
 
 void TEST_Init(void){
-uint32_t id;
 	TIME_Init();
 
 #ifdef __BB__
