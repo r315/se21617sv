@@ -7,6 +7,9 @@
 #define SCREEN_SX (LCD_W/2) - (SCREEN_W/2)
 #define SCREEN_SY (LCD_H/2) - (SCREEN_H/2)
 
+#define SCREEN_BOTTOM	(SCREEN_H - 1 - LCD_GetFontHeight())
+#define SCREEN_TOP		(2 * SPRITE_H)
+
 #define SPRITE_H 8
 #define SPRITE_W 16
 #define SPRITE_SIZE (SPRITE_W * SPRITE_H)
@@ -30,7 +33,7 @@
 #define PROJECTILE_W 2
 #define PROJECTILE_H 6
 
-#define MAX_LIVES 3
+#define MAX_LIVES 1
 
 enum gStates{
     RUNNING,
@@ -61,7 +64,7 @@ typedef struct _gameData{
 	uint8_t lives;
     uint8_t alienscount;
     uint8_t end;
-    uint8_t playername[3];
+    uint8_t playername[4];
     Sprite tank;
 	Sprite bonusalien;
     Sprite aliens[MAX_ALIENS];
