@@ -2,10 +2,7 @@
 #include <string.h>
 #include <time_m3.h>
 
-EMAC_Descriptor *rxdescriptor, *txdescriptor;
-EMAC_RxStatus *rxstatus;
-EMAC_TxStatus *txstatus;
-EMAC_Buffer *rxbuf, *txbuf;
+static EMAC_Memory *emac_memory;
 
 uint32_t ETH_Read(void *packet){
 	uint32_t size, Index = LPC_EMAC->RxConsumeIndex;
@@ -13,10 +10,10 @@ uint32_t ETH_Read(void *packet){
 	if(Index == LPC_EMAC->RxProduceIndex)
 		return(0); 										// no new data
 
-	size = (rxstatus[Index].info & 0x7FF) + 1;			//get packet size from status
+	size = (emac_memory->rxstatus[Index].info & 0x7FF) + 1;			//get packet size from status
 	if (size > ETH_FRAG_SIZE)size = ETH_FRAG_SIZE;		//clip size if bigger than fragment
 
-	memcpy(packet,(unsigned int *)&rxbuf[Index],size);	//copy packet data
+	memcpy(packet,(unsigned int *)&emac_memory->rxbuffer[Index],size);	//copy packet data
 
 	if(++Index > LPC_EMAC->RxDescriptorNumber)			//point to next descriptor
 		Index = 0;
@@ -25,7 +22,6 @@ uint32_t ETH_Read(void *packet){
 
 	return size;
 }
-
 
 uint8_t ETH_Send(void *packet, uint32_t size){
 	uint32_t Index, IndexNext = LPC_EMAC->TxProduceIndex + 1;
@@ -43,9 +39,9 @@ uint8_t ETH_Send(void *packet, uint32_t size){
 	if (size > ETH_FRAG_SIZE)							//clip size
 		size = ETH_FRAG_SIZE;
 
-	memcpy((unsigned int *)&txbuf[Index],packet,size);  //this can be optimize by changing the descriptor pointer to data
-	txdescriptor[Index].control &= ~0x7FF;
-	txdescriptor[Index].control |= (size-1)&0x7FF;
+	memcpy((unsigned int *)&emac_memory->txbuffer[Index],packet,size);  //this can be optimize by changing the descriptor pointer to data
+	emac_memory->txdesc[Index].control &= ~0x7FF;
+	emac_memory->txdesc[Index].control |= (size-1)&0x7FF;
 
 	LPC_EMAC->TxProduceIndex = IndexNext;
 
@@ -92,34 +88,28 @@ uint32_t ETH_GetPHY_ID(void){
 
 void ETH_InitDescriptors(void){
 	uint32_t i;
-	//Initialize Descriptors
-	rxdescriptor = (EMAC_Descriptor*)RX_DESC_BASE;
-	rxstatus     = (EMAC_RxStatus*)RX_STAT_BASE;
-	txdescriptor = (EMAC_Descriptor*)TX_DESC_BASE;
-	txstatus     = (EMAC_TxStatus*)TX_STAT_BASE;
-	rxbuf 		 = (EMAC_Buffer*)RX_BUF_BASE;
-	txbuf		 = (EMAC_Buffer*)TX_BUF_BASE;
+	emac_memory = (EMAC_Memory*)EMAC_MEM_BASE;
 
 	for(i = 0; i < NUM_RX_FRAG; i++){
-		rxdescriptor[i].packet = &rxbuf[i];
-		rxdescriptor[i].control = RCTRL_INT | (ETH_FRAG_SIZE - 1);
-		rxstatus[i].info = 0;
-		rxstatus[i].crc = 0;
+		emac_memory->rxdesc[i].packet = &emac_memory->rxbuffer[i];
+		emac_memory->rxdesc[i].control = RCTRL_INT | (ETH_FRAG_SIZE - 1);
+		emac_memory->rxstatus[i].info = 0;
+		emac_memory->rxstatus[i].crc = 0;
 	}
 
-	LPC_EMAC->RxDescriptor = RX_DESC_BASE;
-	LPC_EMAC->RxStatus = RX_STAT_BASE;
+	LPC_EMAC->RxDescriptor = (uint32_t)&emac_memory->rxdesc[0];
+	LPC_EMAC->RxStatus = (uint32_t)&emac_memory->rxstatus[0];
 	LPC_EMAC->RxDescriptorNumber = NUM_RX_FRAG - 1;
 	LPC_EMAC->RxConsumeIndex = 0;
 
 	for(i = 0; i < NUM_TX_FRAG; i++){
-		txdescriptor[i].packet  = &txbuf[i];
-		txdescriptor[i].control = 0;
-		txstatus[i].info = 0;
+		emac_memory->txdesc[i].packet  = &emac_memory->txbuffer[i];
+		emac_memory->txdesc[i].control = (1<<31) | (1<<30) | (1<<29) | (1<<28) | (1<<26) | (ETH_FRAG_SIZE-1);
+		emac_memory->txstatus[i].info = 0;
 	}
 
-	LPC_EMAC->TxDescriptor = TX_DESC_BASE;
-	LPC_EMAC->TxStatus = TX_STAT_BASE;
+	LPC_EMAC->TxDescriptor = (uint32_t)&emac_memory->txdesc[0];
+	LPC_EMAC->TxStatus = (uint32_t)&emac_memory->txstatus[0];
 	LPC_EMAC->TxDescriptorNumber = NUM_TX_FRAG - 1;
 	LPC_EMAC->TxProduceIndex = 0;
  }
@@ -176,7 +166,7 @@ void ETH_Init(void){
 	LPC_EMAC->CLRT = CLRT_DEF;
 	LPC_EMAC->IPGR = IPGR_DEF;
 
-	LPC_EMAC->MCFG = MCFG_RESET_MII;
+	LPC_EMAC->MCFG = MCFG_CK64 | MCFG_RESET_MII;
 	TIME_DelayMs(5);
 	LPC_EMAC->MCFG = MCFG_CK64;					//MII Clock, select divider for 2,5Mhx to 12Mhz
 
@@ -195,6 +185,6 @@ void ETH_Init(void){
 	LPC_EMAC->IntEnable = INT_RX_DONE | INT_TX_DONE;	  	//Enable interrupts for dedicated DMA
 	LPC_EMAC->IntClear  = 0xFFFF;
 
-	LPC_EMAC->Command |= CMD_RX_EN | CMD_TX_EN;			 	//enable send and receive
+	LPC_EMAC->Command |= (CMD_RX_EN | CMD_TX_EN);			 	//enable send and receive
 	LPC_EMAC->MAC1 |= MAC1_RCV_EN;							//enable frame receive
 }

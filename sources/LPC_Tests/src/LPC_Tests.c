@@ -75,6 +75,7 @@ int main(void) {
 	//PWM_TestInit();
 
 	while(1) {
+		//uIP_Test();
 		BUTTON_Hit();
 		//Button_Test();
 		//PWM_Test();

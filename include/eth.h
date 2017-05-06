@@ -106,12 +106,7 @@
 #define ETH_MAX_FLEN 1536		/* Max. Ethernet Frame Size */
 
 /* EMAC variables located in AHB SRAM bank 1 */
-#define RX_DESC_BASE 	0x2007C000						//RamAHB32
-#define RX_STAT_BASE	(RX_DESC_BASE + NUM_RX_FRAG*8)
-#define TX_DESC_BASE	(RX_STAT_BASE + NUM_RX_FRAG*8)
-#define TX_STAT_BASE	(TX_DESC_BASE + NUM_TX_FRAG*8)
-#define RX_BUF_BASE		(TX_STAT_BASE + NUM_TX_FRAG*4)
-#define TX_BUF_BASE		(RX_BUF_BASE + NUM_RX_FRAG*ETH_FRAG_SIZE)
+#define EMAC_MEM_BASE 	0x2007C000						//RamAHB32
 
 typedef struct _Desc{
 	void *packet;
@@ -130,6 +125,15 @@ typedef struct _TxStatus{
 typedef struct _ETHBuf{
 	uint8_t data[ETH_FRAG_SIZE];
 }EMAC_Buffer;
+
+typedef struct EMACMem{
+	EMAC_Descriptor rxdesc[NUM_RX_FRAG];
+	EMAC_RxStatus  rxstatus[NUM_RX_FRAG];
+	EMAC_Descriptor txdesc[NUM_TX_FRAG];
+	EMAC_TxStatus  txstatus[NUM_TX_FRAG];
+	EMAC_Buffer rxbuffer[NUM_RX_FRAG];
+	EMAC_Buffer txbuffer[NUM_TX_FRAG];
+}EMAC_Memory;
 
 /* Serial Management Interface Registers*/
 #define LAN8720_ID  0x0007C0F0
