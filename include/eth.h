@@ -25,7 +25,7 @@
  *	GS1,GS2 	GND
  */
 
-#define IF_MAC 0x038652201704
+#define IF_MAC 0x4C5043455850 //LPCEXP//0x038652201704
 
 #define ETH_ON (1<<30)
 

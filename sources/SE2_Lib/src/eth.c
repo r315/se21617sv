@@ -45,7 +45,7 @@ uint8_t ETH_Send(void *packet, uint32_t size){
 
 	LPC_EMAC->TxProduceIndex = IndexNext;
 
-	return 1;
+	return size;
 }
 
 
@@ -115,39 +115,53 @@ void ETH_InitDescriptors(void){
  }
 
 void ETH_InitPHY(void){
+	uint16_t phystatus = 0;
 	uint32_t loop;
-	uint16_t phystatus;
 
+	/* Reset PHY */
 	ETH_WritePHY(PHY_CR, PHY_RESET);
 
-	phystatus = loop = 0;
+	loop = 0x10000;
 	do{
 		phystatus = ETH_ReadPHY(PHY_SR);
-		loop++;
-	}while((phystatus & PHY_RESET) && loop < 0x100);
+		loop--;
+	 }while((phystatus & PHY_RESET) && loop);
 
-	loop = 0;
-	ETH_WritePHY(PHY_CR, PHY_AUTO_NEGOTIATE); //set auto negotiate
+	//if(!loop) printf("PHY Reset Fail: %x", phystatus);
 
-	while(!(phystatus & (PHY_AN_COMPLETED | PHY_LINK)) && loop < 50){
+	/* Setup Auto negotiation */
+	ETH_WritePHY(PHY_CR, PHY_AUTO_NEGOTIATE);
+
+	loop = 0x10000;
+	do{
 		phystatus = ETH_ReadPHY(PHY_SR);
-		loop++;
+		loop--;
+	}while(!(phystatus & PHY_AN_COMPLETED) && loop != 0);
+
+	//if(!loop) printf("Auto negotiation Fail: %x", phystatus);
+
+	/* Check the link status. */
+	loop = 0x10000;
+	do{
+		phystatus = ETH_ReadPHY(PHY_SR);
+		loop--;
+	}while(!(phystatus & PHY_LINK) && loop != 0);
+
+	//if(!loop) printf("No link: %x", phystatus);
+
+	/* Configure connection mode */
+	if(phystatus & PHY_LINK){
+		//full duplex mode
+		LPC_EMAC->MAC2    |= MAC2_FULL_DUP;
+		LPC_EMAC->Command |= CMD_FULL_DUP;
+		LPC_EMAC->IPGT     = IPGT_FULL_DUP;
+	}else{
+		//No link detected configure half duplex mode
+		LPC_EMAC->IPGT = IPGT_HALF_DUP;
 	}
 
-	if(phystatus & PHY_AN_COMPLETED){
-		 if ( phystatus & (PHY_100FD | PHY_10FD) ) {
-			  //full duplex mode
-			  LPC_EMAC->MAC2    |= MAC2_FULL_DUP;
-			  LPC_EMAC->Command |= CMD_FULL_DUP;
-			  LPC_EMAC->IPGT     = IPGT_FULL_DUP;
-		  }
-		  else {
-			  //half duplex mode
-			  LPC_EMAC->IPGT = IPGT_HALF_DUP;
-		  }
-		 // select 100/10Mbit
-		 LPC_EMAC->SUPP = (phystatus & PHY_100FD) ? SUPP_SPEED : 0;
-	}
+	// Configure 10/100Mbit based on status
+	LPC_EMAC->SUPP = (phystatus & PHY_100FD) ? SUPP_SPEED : 0;
 }
 
 void ETH_Init(void){
@@ -185,6 +199,6 @@ void ETH_Init(void){
 	LPC_EMAC->IntEnable = INT_RX_DONE | INT_TX_DONE;	  	//Enable interrupts for dedicated DMA
 	LPC_EMAC->IntClear  = 0xFFFF;
 
-	LPC_EMAC->Command |= (CMD_RX_EN | CMD_TX_EN);			 	//enable send and receive
+	LPC_EMAC->Command |= (CMD_RX_EN | CMD_TX_EN);			//enable send and receive
 	LPC_EMAC->MAC1 |= MAC1_RCV_EN;							//enable frame receive
 }

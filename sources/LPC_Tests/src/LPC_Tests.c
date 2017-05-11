@@ -62,8 +62,8 @@ void TEST_Init(void){
 	ETH_Init();
 	LCD_WriteString("ETH: MAC 06:05:04:03:02:01\n");
 	LCD_WriteString("ETH: PHY ID 0x");
-	LCD_WriteInt(ETH_GetPHY_ID(),16);
-	LCD_WriteChar('\n');
+	//LCD_WriteInt(ETH_GetPHY_ID(),16);
+	//LCD_WriteChar('\n');
 }
 
 int main(void) {
@@ -76,7 +76,7 @@ int main(void) {
 
 	while(1) {
 		//uIP_Test();
-		BUTTON_Hit();
+		//BUTTON_Hit();
 		//Button_Test();
 		//PWM_Test();
 		ETH_Test();

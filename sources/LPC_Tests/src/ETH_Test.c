@@ -1,6 +1,11 @@
 #include <eth.h>
 #include <stdio.h>
 
+uint8_t arprequest[]={
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x06, 0x23, 0x53, 0x45, 0x32, 0x23, 0x08, 0x06, 0x00, 0x01,
+		0x08, 0x00, 0x06, 0x04, 0x00, 0x01, 0xd0, 0x27, 0x88, 0x0c, 0x25, 0x73, 0xc0, 0xa8, 0x00, 0xC8,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0xa8, 0x00, 0x02};
+
 typedef struct ethernet{
 	uint8_t dstMAC[6];
 	uint8_t srcMAC[6];
@@ -37,7 +42,7 @@ typedef struct ip{
 	uint8_t opt[96];
 }Ip	;
 
-#define TYPE_ARP 0x0608 //0x0806
+#define TYPE_ARP 0x0608 //0x0806 big-endian
 #define TYPE_IP  0x0008 //0x0800
 #define PROTOCOL_ICMP 1
 
@@ -54,9 +59,17 @@ uint8_t tmp;
 }
 
 void PrintEthernetPacket(void *pk, uint32_t len){
-    while(len--){
-        printf(" %.2X",*((uint8_t*)(pk++)));
+uint8_t byte, i;
+
+	for(i = 0; i < len; i++){
+    	byte = *((uint8_t*)(pk+i));
+        printf(" %.2X",byte);
     }
+	printf("  ");
+	for(i = 0; i < len; i++){
+	    	byte = *((uint8_t*)(pk+i));
+	        printf(" %c",(char)byte);
+	}
     printf("\n");
 }
 
@@ -85,8 +98,12 @@ void icmpReply(Ip *ip, uint32_t size){
 	ETH_Send(ip,size);
 }
 
-void
+//send arp
+void ETH_Test_(void){
+	ETH_Send(arprequest, sizeof(arprequest));
+}
 
+// ping reply
 void ETH_Test(void){
 uint32_t size;
 uint8_t packet[256];
@@ -94,19 +111,20 @@ uint8_t packet[256];
 	size = ETH_Read(&packet);
 
 	if(size){
-	switch(((Ethernet*)&packet[0])->type){
-		case TYPE_ARP:
-			arpReply((Arp*)packet);
-			break;
-
-		case TYPE_IP:
-			if(((Ip*)&packet[0])->protocol == PROTOCOL_ICMP){
-				icmpReply((Ip*)&packet[0], size);
+		switch(((Ethernet*)&packet[0])->type){
+			case TYPE_ARP:
+				arpReply((Arp*)packet);
 				break;
-			}
 
-		default:
-			PrintEthernetPacket(&packet,14);
-	}
-	}
+			case TYPE_IP:
+				if(((Ip*)&packet[0])->protocol == PROTOCOL_ICMP){
+					icmpReply((Ip*)&packet[0], size);
+					break;
+				}
+
+			default:
+				PrintEthernetPacket(&packet,14);
+		}
+	}else
+		ETH_Send(arprequest, sizeof(arprequest));
 }
