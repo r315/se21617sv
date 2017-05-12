@@ -25,7 +25,7 @@
  *	GS1,GS2 	GND
  */
 
-#define IF_MAC 0x4C5043455850 //LPCEXP//0x038652201704
+#define IF_MAC 0x062353453223 //.#SE2#
 
 #define ETH_ON (1<<30)
 
@@ -166,9 +166,9 @@ void ETH_Init(void);
 
 /**
 * @brief send packet through ethernet
-* @return send result
+* @return size if success, -1 tx buffer full, 0 no data to send
 */
-uint8_t ETH_Send(void *packet, uint32_t size);
+uint32_t ETH_Send(void *packet, uint32_t size);
 
 /**
 * @brief get packet through ethernet

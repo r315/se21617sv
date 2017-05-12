@@ -23,17 +23,18 @@ uint32_t ETH_Read(void *packet){
 	return size;
 }
 
-uint8_t ETH_Send(void *packet, uint32_t size){
+uint32_t ETH_Send(void *packet, uint32_t size){
 	uint32_t Index, IndexNext = LPC_EMAC->TxProduceIndex + 1;
 
 	if(size == 0)
-		return 1;										//no data to be sent
+		return 0;										//no data to be sent
 
 	if(IndexNext > LPC_EMAC->TxDescriptorNumber)		//point to descriptor
 		IndexNext = 0;
 
-	if(IndexNext == LPC_EMAC->TxConsumeIndex)
-		return 0;										//fail buffer is full
+	if(IndexNext == LPC_EMAC->TxConsumeIndex){
+		return -1;										//fail buffer is full
+	}
 
 	Index = LPC_EMAC->TxProduceIndex;
 	if (size > ETH_FRAG_SIZE)							//clip size
@@ -49,8 +50,8 @@ uint8_t ETH_Send(void *packet, uint32_t size){
 }
 
 
-unsigned short ETH_ReadPHY (unsigned char reg){
-	unsigned int tout = PHY_REG_TOUT;
+uint16_t ETH_ReadPHY (unsigned char reg){
+uint16_t tout = PHY_REG_TOUT;
 	// Set up address to access in MII Mgmt Address Register
 	LPC_EMAC->MADR = PHY_ADR | reg;
 	// Trigger a PHY read via MII Mgmt Command Register
@@ -88,8 +89,13 @@ uint32_t ETH_GetPHY_ID(void){
 
 void ETH_InitDescriptors(void){
 	uint32_t i;
+
+	/* Set EMAC Base Address for descriptors, status and buffers */
 	emac_memory = (EMAC_Memory*)EMAC_MEM_BASE;
 
+	/* Initialize receive descriptor packet with pointer to buffer set
+	 * Receive interrupt for internal DMA and set packet size on control
+	 */
 	for(i = 0; i < NUM_RX_FRAG; i++){
 		emac_memory->rxdesc[i].packet = &emac_memory->rxbuffer[i];
 		emac_memory->rxdesc[i].control = RCTRL_INT | (ETH_FRAG_SIZE - 1);
@@ -102,9 +108,12 @@ void ETH_InitDescriptors(void){
 	LPC_EMAC->RxDescriptorNumber = NUM_RX_FRAG - 1;
 	LPC_EMAC->RxConsumeIndex = 0;
 
+	/* Initialize Transmit descriptor packet with pointer to buffer set
+	 * Transmit interrupt for internal DMA, misc flags and set packet size on control
+	 */
 	for(i = 0; i < NUM_TX_FRAG; i++){
 		emac_memory->txdesc[i].packet  = &emac_memory->txbuffer[i];
-		emac_memory->txdesc[i].control = (1<<31) | (1<<30) | (1<<29) | (1<<28) | (1<<26) | (ETH_FRAG_SIZE-1);
+		emac_memory->txdesc[i].control = (0x3D<<26) | (ETH_FRAG_SIZE-1); //INT|LAST|CRC|PAD|OVERRIDE
 		emac_memory->txstatus[i].info = 0;
 	}
 

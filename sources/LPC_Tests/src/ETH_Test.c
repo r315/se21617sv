@@ -1,5 +1,6 @@
 #include <eth.h>
 #include <stdio.h>
+#include <lcd.h>
 
 uint8_t arprequest[]={
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x06, 0x23, 0x53, 0x45, 0x32, 0x23, 0x08, 0x06, 0x00, 0x01,
@@ -76,7 +77,7 @@ uint8_t byte, i;
 void setMAC(uint8_t *dst){
 uint8_t i;
 	for(i = 0; i < 6; i++){
-		dst[i]= 6 - i;
+		dst[5-i]= (IF_MAC>>(8*i))&255;
 	}
 }
 
@@ -95,7 +96,8 @@ void arpReply(Arp *arp){
 void icmpReply(Ip *ip, uint32_t size){
 	swapBytes((uint8_t*)&ip->ethernet.dstMAC, (uint8_t*)&ip->ethernet.srcMAC, 6);
 	swapBytes((uint8_t*)&ip->srcIP, (uint8_t*)&ip->dstIP,4);
-	ETH_Send(ip,size);
+	if(ETH_Send(ip,size) < 0)
+		LCD_WriteString("TX buffer Full\n");
 }
 
 //send arp
@@ -103,6 +105,7 @@ void ETH_Test_(void){
 	ETH_Send(arprequest, sizeof(arprequest));
 }
 
+// if fail try reset board while connected to lan
 // ping reply
 void ETH_Test(void){
 uint32_t size;
@@ -125,6 +128,6 @@ uint8_t packet[256];
 			default:
 				PrintEthernetPacket(&packet,14);
 		}
-	}else
-		ETH_Send(arprequest, sizeof(arprequest));
+	}//else
+		//ETH_Send(arprequest, sizeof(arprequest));
 }

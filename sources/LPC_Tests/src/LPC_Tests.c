@@ -49,21 +49,27 @@ void TEST_Init(void){
 	LCD_Bkl(ON);
 
 	LED_Init(LED,LED_OFF);
-	LCD_WriteString("Led Initialized: OFF\n");
+	LCD_WriteString("LED: OFF\n");
 
 	BUTTON_Init(BUTTON_DEFAULT_HOLD_TIME);
-	LCD_WriteString("Buttons Initialized: 2s\n");
+	LCD_WriteString("BUTTONS: Hold 2s\n");
 
 	EEPROM_Init();
-	LCD_WriteString("EEPROM on I2C");
+	LCD_WriteString("EEPROM: Bus I2C");
 	LCD_WriteInt(EEPROM_GetIfNumber(),10);
 	LCD_WriteChar('\n');
 
 	ETH_Init();
-	LCD_WriteString("ETH: MAC 06:05:04:03:02:01\n");
+	LCD_WriteString("ETH: MAC ");
+	LCD_WriteInt((uint8_t)(IF_MAC>>5*8), (2<<8) | 16); LCD_WriteChar(':');
+	LCD_WriteInt((uint8_t)(IF_MAC>>4*8), (2<<8) | 16); LCD_WriteChar(':');
+	LCD_WriteInt((uint8_t)(IF_MAC>>3*8), (2<<8) | 16); LCD_WriteChar(':');
+	LCD_WriteInt((uint8_t)(IF_MAC>>2*8), (2<<8) | 16); LCD_WriteChar(':');
+	LCD_WriteInt((uint8_t)(IF_MAC>>1*8), (2<<8) | 16); LCD_WriteChar(':');
+	LCD_WriteInt((uint8_t)(IF_MAC>>0*8), (2<<8) | 16); LCD_WriteChar('\n');
 	LCD_WriteString("ETH: PHY ID 0x");
-	//LCD_WriteInt(ETH_GetPHY_ID(),16);
-	//LCD_WriteChar('\n');
+	LCD_WriteInt(ETH_GetPHY_ID(),16);
+	LCD_WriteChar('\n');
 }
 
 int main(void) {
@@ -75,11 +81,11 @@ int main(void) {
 	//PWM_TestInit();
 
 	while(1) {
-		//uIP_Test();
+		uIP_Test();
 		//BUTTON_Hit();
 		//Button_Test();
 		//PWM_Test();
-		ETH_Test();
+		//ETH_Test();
 		TIME_DelayMs(100);
 	}
 
