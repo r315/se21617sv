@@ -3,6 +3,10 @@
 //#include <lcd.h>
 #include "ili9341.h"
 
+void LCD_Scroll(uint16_t sc){
+	LCD_Command(VSCRSADD);
+	LCD_Data(sc);
+}
 
 void LCD_Bkl(uint32_t state){
     if(state) LCD_BKL1;
