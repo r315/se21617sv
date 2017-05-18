@@ -69,7 +69,10 @@ uint8_t byte, i;
 	printf("  ");
 	for(i = 0; i < len; i++){
 	    	byte = *((uint8_t*)(pk+i));
-	        printf(" %c",(char)byte);
+	    	if((byte < ' ') || (byte > '~'))
+	    		putchar('.');
+	    	else
+	    		printf(" %c",(char)byte);
 	}
     printf("\n");
 }

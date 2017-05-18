@@ -13,7 +13,7 @@ uint32_t ETH_Read(void *packet){
 	size = (emac_memory->rxstatus[Index].info & 0x7FF) + 1;			//get packet size from status
 	if (size > ETH_FRAG_SIZE)size = ETH_FRAG_SIZE;		//clip size if bigger than fragment
 
-	memcpy(packet,(unsigned int *)&emac_memory->rxbuffer[Index],size);	//copy packet data
+	memcpy(packet,(uint8_t *)&emac_memory->rxbuffer[Index],size);	//copy packet data
 
 	if(++Index > LPC_EMAC->RxDescriptorNumber)			//point to next descriptor
 		Index = 0;
@@ -40,7 +40,7 @@ uint32_t ETH_Send(void *packet, uint32_t size){
 	if (size > ETH_FRAG_SIZE)							//clip size
 		size = ETH_FRAG_SIZE;
 
-	memcpy((unsigned int *)&emac_memory->txbuffer[Index],packet,size);  //this can be optimize by changing the descriptor pointer to data
+	memcpy((uint8_t *)&emac_memory->txbuffer[Index],packet,size);  //this can be optimize by changing the descriptor pointer to data
 	emac_memory->txdesc[Index].control &= ~0x7FF;
 	emac_memory->txdesc[Index].control |= (size-1)&0x7FF;
 

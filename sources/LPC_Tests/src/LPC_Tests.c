@@ -76,16 +76,23 @@ int main(void) {
 
 	TEST_Init();
 
-	//EEprom_Test();
+	#ifdef __EEPROM__
+	EEprom_Test();
+	#endif
 
-	//PWM_TestInit();
+
 
 	while(1) {
+
+	#ifdef __UIP__
 		uIP_Test();
+	#elif __ETH__
+		ETH_Test();
 		//BUTTON_Hit();
 		//Button_Test();
 		//PWM_Test();
-		//ETH_Test();
+		//PWM_TestInit();
+	#endif
 		TIME_DelayMs(100);
 	}
 
