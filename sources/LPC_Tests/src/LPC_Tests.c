@@ -43,6 +43,11 @@ void TEST_Init(void){
 #endif
 
 	LCD_Clear(BLACK);
+
+#if defined(__ETH__) || defined(__UIP__)
+	LCD_Rotation(2);
+#endif
+
 	LCD_Rect(90,20,100,100,RED);
 	LCD_SetColors(YELLOW, BLACK);
 	LCD_WriteString("Hello\n");
@@ -58,7 +63,7 @@ void TEST_Init(void){
 	LCD_WriteString("EEPROM: Bus I2C");
 	LCD_WriteInt(EEPROM_GetIfNumber(),10);
 	LCD_WriteChar('\n');
-
+#if defined(__ETH__) || defined(__UIP__)
 	ETH_Init();
 	LCD_WriteString("ETH: MAC ");
 	LCD_WriteInt((uint8_t)(IF_MAC>>5*8), (2<<8) | 16); LCD_WriteChar(':');
@@ -70,6 +75,7 @@ void TEST_Init(void){
 	LCD_WriteString("ETH: PHY ID 0x");
 	LCD_WriteInt(ETH_GetPHY_ID(),16);
 	LCD_WriteChar('\n');
+#endif
 }
 
 int main(void) {
@@ -81,14 +87,39 @@ int main(void) {
 	#endif
 
 
-
 	while(1) {
 
 	#ifdef __UIP__
 		uIP_Test();
-	#elif __ETH__
+	#elif defined(__ETH__)
 		ETH_Test();
-		//BUTTON_Hit();
+	#elif defined(__ROT__)
+		BUTTON_Hit();
+
+		if(BUTTON_GetEvents() == BUTTON_PRESSED){
+			switch(BUTTON_GetValue()){
+			case BUTTON_UP:
+						LCD_Rotation(0);
+						LCD_Goto(0,0);
+						LCD_WriteString("Rotaton 0");
+						break;
+			case BUTTON_DOWN:
+						LCD_Rotation(1);
+						LCD_Goto(0,0);
+						LCD_WriteString("Rotaton 1");
+						break;
+			case BUTTON_LEFT:
+						LCD_Rotation(2);
+						LCD_Goto(0,0);
+						LCD_WriteString("Rotaton 2");
+						break;
+			case BUTTON_RIGHT:
+						LCD_Rotation(3);
+						LCD_Goto(0,0);
+						LCD_WriteString("Rotaton 3");
+						break;
+			}
+		}
 		//Button_Test();
 		//PWM_Test();
 		//PWM_TestInit();

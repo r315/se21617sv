@@ -3,6 +3,21 @@
 //#include <lcd.h>
 #include "ili9341.h"
 
+
+static uint16_t _width, _height;
+
+uint32_t LCD_GetWidth(void){
+	return _width;
+}
+
+uint32_t LCD_GetHeight(void){
+	return _height;
+}
+
+uint32_t LCD_GetSize(void){
+	return _height*_width;
+}
+
 void LCD_Scroll(uint16_t sc){
 	LCD_Command(VSCRSADD);
 	LCD_Data(sc);
@@ -115,7 +130,7 @@ void LCD_Init(void){
         LCD_Command(VCOM2);
         LCD_Data(0x86);  
         /* Memory Access Control */
-        LCD_Command(MAC);      // Memory Access Control 
+        LCD_Command(MADCTL);  // Memory Access Control
         LCD_Data(0x48);       //C8  //48 68??//28 E8 ??
 
         LCD_Command(COLMOD);    
@@ -140,8 +155,42 @@ void LCD_Init(void){
                 
         LCD_Command(DISPON);    //Display on 
         TIME_DelayMs(120);
-        LCD_Command(RAMWR);  
+        LCD_Command(RAMWR);
 
-        //LCD_BKL1;
+        _width  = TFT_W;
+        _height = TFT_H;
+        // user must enable backlight after LCD_Init
 }
+
+void LCD_Rotation(uint8_t m) {
+
+    switch (m) {
+        case 0:
+            m = (MADCTL_MX | MADCTL_BGR);
+            _width  = TFT_W;
+            _height = TFT_H;
+            break;
+        case 1:
+            m = (MADCTL_MV | MADCTL_BGR);
+            _width  = TFT_H;
+            _height = TFT_W;
+            break;
+        case 2:
+            m = (MADCTL_MY | MADCTL_BGR);
+            _width  = TFT_W;
+            _height = TFT_H;
+            break;
+        case 3:
+            m = (MADCTL_MX | MADCTL_MY | MADCTL_MV | MADCTL_BGR);
+            _width  = TFT_H;
+            _height = TFT_W;
+            break;
+
+        default:
+        	return;
+    }
+    LCD_Command(MADCTL);
+    LCD_Data(m<<8);
+}
+
 

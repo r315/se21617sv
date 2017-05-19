@@ -12,9 +12,9 @@
 
 #include <stdint.h>
 
-#define LCD_W 240
-#define LCD_H 320
-#define LCD_SIZE LCD_W * LCD_H
+#define LCD_W LCD_GetWidth()   //240
+#define LCD_H LCD_GetHeight()  //320
+#define LCD_SIZE LCD_GetSize() //LCD_W * LCD_H
 
 /* basic color constants */
 #define RGB(r,g,b)  (int)((r<<11) | (g<<5) | b)
@@ -126,5 +126,6 @@ void LCD_Rect(uint16_t x, uint16_t y,  uint16_t w, uint16_t h, uint16_t color);
  *        onde data uma tabela de cores e uma sequencia de cores a usar
  **/
 void LCD_IndexedColor(uint16_t *colors, uint8_t *index, uint32_t size);
+
 #endif
 

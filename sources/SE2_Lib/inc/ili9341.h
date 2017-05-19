@@ -12,6 +12,9 @@
 
 #include <gpio.h>
 
+#define TFT_W 240
+#define TFT_H 320
+
 #include <stdint.h>
 #if defined(__LPC17XX__)
 /**
@@ -75,7 +78,7 @@
 #define CASET    0x2A
 #define PASET    0x2B
 #define RAMWR    0x2C
-#define MAC      0x36   // Memory Access Control
+#define MADCTL   0x36   // Memory Access Control
 #define VSCRSADD 0x37
 #define COLMOD   0x3A   // Pixel Format set
 #define FRCONN   0xB1   // Frame rate control Normal mode
@@ -92,6 +95,14 @@
 #define DTCONB   0xEA   // Driver Timming Control B
 #define PSCON    0xED   // Power on Sequence control
 #define PRCON    0xF7   // Pump ratio control
+
+#define MADCTL_MY  0x80
+#define MADCTL_MX  0x40
+#define MADCTL_MV  0x20
+#define MADCTL_ML  0x10
+#define MADCTL_RGB 0x00
+#define MADCTL_BGR 0x08
+#define MADCTL_MH  0x04
 
 
 /**
@@ -116,5 +127,26 @@ void LCD_Data16(uint16_t data);
  * @brief
  */
 void LCD_Scroll(uint16_t sc);
+
+/**
+ * @brief
+ */
+uint32_t LCD_GetWidth(void);
+
+/**
+ * @brief
+ */
+uint32_t LCD_GetHeight(void);
+
+/**
+ * @brief
+ */
+uint32_t LCD_GetSize(void);
+
+/*
+ * @brief set display rotation
+ */
+void LCD_Rotation(uint8_t m);
+
 #endif
 
