@@ -66,8 +66,13 @@ enum Bevent{
 
 #define BUTTON_MASK (BUTTON_U | BUTTON_D | BUTTON_L | BUTTON_R | BUTTON_A)
 
-#define BUTTON_GetValue()  LPC_GPIO0->FIOPIN          //do not call this functions directly
+#define BUTTON_Capture()   (~(LPC_GPIO0->FIOPIN) & BUTTON_MASK);
 #define BUTTON_SetInput(x) LPC_GPIO0->FIODIR &= ~(x)
+
+#define BUTTON_UP    BUTTON_U
+#define BUTTON_DOWN  BUTTON_D
+#define BUTTON_LEFT  BUTTON_L
+#define BUTTON_RIGHT BUTTON_R
 
 #else
 /**
@@ -129,7 +134,8 @@ int BUTTON_GetEvents(void);
  * @brief Devolve o codigo (bitmap) da tecla corrente
  *        EMPTY se nenhuma tecla pressionada
  **/
-int BUTTON_GetButton(void); 
+int BUTTON_GetButton(void);
+#define BUTTON_GetValue BUTTON_GetButton
 
 /**
 * @brief Efectua uma espera pelo evento dado no parametro*        

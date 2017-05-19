@@ -12,9 +12,10 @@
 
 static BUTTON_Controller __button;
 
+/* defined on header
 uint32_t BUTTON_Capture(void){
     return (~(BUTTON_GetValue())) & BUTTON_MASK;  //common ground
-}
+}*/
 
 void BUTTON_Init(int ht){    
     __button.cur  = BUTTON_EMPTY;
