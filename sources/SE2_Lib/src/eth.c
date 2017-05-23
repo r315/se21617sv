@@ -141,7 +141,7 @@ void ETH_InitPHY(void){
 	/* Setup Auto negotiation */
 	ETH_WritePHY(PHY_CR, PHY_AUTO_NEGOTIATE);
 
-	loop = 0x10000;
+	loop = 10;
 	do{
 		phystatus = ETH_ReadPHY(PHY_SR);
 		loop--;
@@ -150,7 +150,7 @@ void ETH_InitPHY(void){
 	//if(!loop) printf("Auto negotiation Fail: %x", phystatus);
 
 	/* Check the link status. */
-	loop = 0x10000;
+	loop = 10;
 	do{
 		phystatus = ETH_ReadPHY(PHY_SR);
 		loop--;
