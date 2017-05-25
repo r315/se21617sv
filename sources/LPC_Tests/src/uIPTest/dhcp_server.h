@@ -39,8 +39,32 @@ struct dhcp_msg {
   uint8_t options[312];
 };
 
+
+enum{
+	STATE_INITIAL,
+	STATE_SENDING,
+	STATE_OFFER_RECEIVED,
+	STATE_CONFIG_RECEIVED
+};
+
+#define IP_POOL 169,254,9,0
+
+#define DHCPC_SERVER_PORT  67
+#define DHCPC_CLIENT_PORT  68
+
 #define UIP_UDP_APPCALL dhcpc_server_appcall
 
+#define DHCP_LOG
+
+#ifdef DHCP_LOG
+#define DHCP_LOG(m) dhcp_server_log(m)
+void dhcp_server_log(char *log);
+#else
+#define DHCP_LOG(m)
+#endif
+
+
 void dhcpc_server_appcall(void);
+uint8_t dhcp_server_input(void);
 
 #endif

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <time_m3.h>
 
+static char _ifmac[6];
 static EMAC_Memory *emac_memory;
 
 uint32_t ETH_Read(void *packet){
@@ -173,6 +174,29 @@ void ETH_InitPHY(void){
 	LPC_EMAC->SUPP = (phystatus & PHY_100FD) ? SUPP_SPEED : 0;
 }
 
+uint8_t parseHex(uint8_t *h){
+uint8_t hex;
+	hex = ((*h) - '0') & 0x1F;
+	if(hex > 0x0F)
+		hex -= 7;
+	return hex;
+}
+
+void ETH_ParseIF_MAC(uint8_t *dst, uint8_t *ift){
+char hex = 0;
+	while(*ift){
+		if(*ift != ':'){
+			hex <<=4;
+			hex |= parseHex(ift);
+		}else{
+			*dst++ = hex;
+			hex = 0;
+		}
+		ift +=1;
+	}
+	*dst = hex;
+}
+
 void ETH_Init(void){
 	LPC_SC->PCONP |= ETH_ON;
 	ETH_ConfigPins();
@@ -199,10 +223,12 @@ void ETH_Init(void){
 
 	ETH_InitDescriptors();
 
+	ETH_ParseIF_MAC(_ifmac, IF_MAC);
+
 	//Configure Ethernet physical address
-	LPC_EMAC->SA2 = IF_MAC >> 32;
-	LPC_EMAC->SA1 = IF_MAC >> 16;
-	LPC_EMAC->SA0 = IF_MAC & 0xFFFF;
+	LPC_EMAC->SA2 = (_ifmac[5]<<8) | _ifmac[4];
+	LPC_EMAC->SA1 = (_ifmac[3]<<8) | _ifmac[2];
+	LPC_EMAC->SA0 = (_ifmac[1]<<8) | _ifmac[0];
 
 	LPC_EMAC->RxFilterCtrl = RFC_BROADCAST | RFC_PERFECT; 	//Filter only good packets ans broadcast
 	LPC_EMAC->IntEnable = INT_RX_DONE | INT_TX_DONE;	  	//Enable interrupts for dedicated DMA
@@ -210,4 +236,8 @@ void ETH_Init(void){
 
 	LPC_EMAC->Command |= (CMD_RX_EN | CMD_TX_EN);			//enable send and receive
 	LPC_EMAC->MAC1 |= MAC1_RCV_EN;							//enable frame receive
+}
+
+uint8_t *ETH_GetIF_MAC(void){
+	return _ifmac;
 }

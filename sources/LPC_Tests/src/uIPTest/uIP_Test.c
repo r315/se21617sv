@@ -43,6 +43,7 @@
 #include "timer.h"
 #include <stdio.h>
 #include <string.h>
+#include "util.h"
 
 #define BUF ((struct uip_eth_hdr *)&uip_buf[0])
 
@@ -53,10 +54,10 @@
 uint8_t mac[] = {0x06,0x23,0x53,0x45,0x32,0x23};
 
 void UIP_UTIL_PrintIp(uip_ipaddr_t ip);
+void dhcp_server_init(void);
 
 /*---------------------------------------------------------------------------*/
 int uIP_Test(void) {
-
 
 	//uIP_EEprom();
 
@@ -73,6 +74,7 @@ int uIP_Test(void) {
 	memcpy(&uip_ethaddr.addr,mac,6); //set physical address
 
 	uip_ipaddr(ipaddr, 169,254,9,161);
+	//uip_ipaddr(ipaddr, 0,0,0,0);
 	uip_sethostaddr(ipaddr);
 
 	uip_ipaddr(ipaddr, 169,254,9,160);
@@ -88,9 +90,8 @@ int uIP_Test(void) {
 
 	/*  hello_world_init();*/
 
-#ifdef __DHCPC_H__
-	 dhcpc_init(&mac, 6);
-#endif
+
+	 dhcp_server_init();
 
 	/*uip_ipaddr(ipaddr, 127,0,0,1);
 	 smtp_configure("localhost", ipaddr);
@@ -105,9 +106,31 @@ int uIP_Test(void) {
 	 resolv_conf(ipaddr);
 	 resolv_query("www.sics.se");*/
 
+
 	while (1) {
 		uip_len = tapdev_read();
 		if (uip_len > 0) {
+
+			switch(BUF->type){
+			case HTONS(UIP_ETHTYPE_IP):
+					//uip_arp_ipin();
+					uip_input();
+					if (uip_len > 0) {
+						uip_arp_out();
+						tapdev_send();
+					}/*else{
+						dhcp_server_input();
+					}*/
+					break;
+			case  HTONS(UIP_ETHTYPE_ARP):
+						uip_arp_arpin();
+						if (uip_len > 0) {
+							tapdev_send();
+						}
+						break;
+			}
+
+#if 0
 			if (BUF->type == htons(UIP_ETHTYPE_IP)) {
 				uip_arp_ipin();
 				uip_input();
@@ -127,8 +150,11 @@ int uIP_Test(void) {
 					tapdev_send();
 				}
 			}
+#endif
 
-		} else if (timer_expired(&periodic_timer)) {
+
+		}else {
+			if (timer_expired(&periodic_timer)) {
 			timer_reset(&periodic_timer);
 			for (i = 0; i < UIP_CONNS; i++) {
 				uip_periodic(i);
@@ -160,6 +186,7 @@ int uIP_Test(void) {
 				uip_arp_timer();
 			}
 		}
+	}
 	}
 	return 0;
 }

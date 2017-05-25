@@ -77,15 +77,8 @@ uint8_t byte, i;
     printf("\n");
 }
 
-void setMAC(uint8_t *dst){
-uint8_t i;
-	for(i = 0; i < 6; i++){
-		dst[5-i]= (IF_MAC>>(8*i))&255;
-	}
-}
-
 void arpReply(Arp *arp){
-	setMAC((uint8_t*)&arp->ethernet.dstMAC);
+	memcpy(&arp->ethernet.dstMAC, ETH_GetIF_MAC, 6);
 	swapBytes((uint8_t*)&arp->ethernet.dstMAC, (uint8_t*)&arp->ethernet.srcMAC, 6);
 	arp->opcode = 2;  //reply
 	setMAC((uint8_t*)&arp->targetMAC);

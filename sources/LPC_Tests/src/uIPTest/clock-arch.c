@@ -1,12 +1,17 @@
 #ifdef __UIP__
 
 #include <util.h>
+#include "timer.h"
 
 /*
- * @brief returns passed seconds
+ * @brief
  */
 int clock_time(void){
-	return TIME_GetValue() / 1000;
+	return  TIME_GetValue();
+}
+
+int clock_elapsed(struct timer *t){
+	return clock_time() - t->start;
 }
 
 #else
@@ -57,10 +62,10 @@ int clock_time(void){
 clock_time_t
 clock_time(void)
 {
-  //struct timeval tv;
-  //struct timezone tz;
+  struct timeval tv;
+  struct timezone tz;
 
-  //gettimeofday(&tv, &tz);
+  gettimeofday(&tv, &tz);
 
   return tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }

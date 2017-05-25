@@ -30,3 +30,4 @@ docs
 
 #uIP stuff
 sources/SE2_Lib/uip
+sources/FreeRTOS_Library

@@ -25,7 +25,8 @@
  *	GS1,GS2 	GND
  */
 
-#define IF_MAC 0x062353453223 //.#SE2#  06:23:53:45:32:23
+/*Define Interface Mac Address Here */
+#define IF_MAC  "06:23:53:45:32:23" //.#SE2#
 
 #define ETH_ON (1<<30)
 
@@ -165,21 +166,28 @@ typedef struct EMACMem{
 void ETH_Init(void);
 
 /**
-* @brief send packet through ethernet
-* @return size if success, -1 tx buffer full, 0 no data to send
+* @brief Envia um pacote ethernet para a camada fisica
+* @return o tamanho do pacote transmitido em caso de envio com sucessso ,
+* 			-1 quando o buffer de transmissão esta cheio, 0 para o caso de n existir dados para enviar
 */
 uint32_t ETH_Send(void *packet, uint32_t size);
 
 /**
-* @brief get packet through ethernet
-* @return size of packet
+* @brief obtem um pacote ethernet recebido pela camada fisica
+* @return o tamanho do pacote recebido, 0 não foi recebido qualquer pacote
 */
 uint32_t ETH_Read(void *packet);
 
 /**
-* @brief get PHY ID
-* @return id
+* @brief obtem o identificador do interface fisico ligado ao bus MII
+* @return Identificador
 */
 uint32_t ETH_GetPHY_ID(void);
+
+/**
+ * @brief Devolve o enderesso fisico do atribuido ao interface ethernet
+ * @return ponteiro para array de 6 bytes
+ */
+uint8_t *ETH_GetIF_MAC(void);
 
 #endif
