@@ -53,11 +53,11 @@ void TEST_Init(void){
 	LCD_WriteString("Hello\n");
 	LCD_Bkl(ON);
 
-	LED_Init(LED,LED_OFF);
-	LCD_WriteString("LED: OFF\n");
+	LCD_WriteString("Clock: ");	LCD_WriteInt(SystemCoreClock,10); LCD_WriteChar('\n');
 
-	BUTTON_Init(BUTTON_DEFAULT_HOLD_TIME);
-	LCD_WriteString("BUTTONS: Hold 2s\n");
+	LED_Init(LED,LED_OFF);	LCD_WriteString("LED: OFF\n");
+
+	BUTTON_Init(BUTTON_DEFAULT_HOLD_TIME); 	LCD_WriteString("BUTTONS: Hold 2s\n");
 
 	EEPROM_Init();
 	LCD_WriteString("EEPROM: Bus I2C");
@@ -65,13 +65,8 @@ void TEST_Init(void){
 	LCD_WriteChar('\n');
 #if defined(__ETH__) || defined(__UIP__)
 	ETH_Init();
-	LCD_WriteString("ETH: MAC ");
-	LCD_WriteInt((uint8_t)(IF_MAC>>5*8), (2<<8) | 16); LCD_WriteChar(':');
-	LCD_WriteInt((uint8_t)(IF_MAC>>4*8), (2<<8) | 16); LCD_WriteChar(':');
-	LCD_WriteInt((uint8_t)(IF_MAC>>3*8), (2<<8) | 16); LCD_WriteChar(':');
-	LCD_WriteInt((uint8_t)(IF_MAC>>2*8), (2<<8) | 16); LCD_WriteChar(':');
-	LCD_WriteInt((uint8_t)(IF_MAC>>1*8), (2<<8) | 16); LCD_WriteChar(':');
-	LCD_WriteInt((uint8_t)(IF_MAC>>0*8), (2<<8) | 16); LCD_WriteChar('\n');
+	LCD_WriteString("ETH: MAC ");LCD_WriteString(IF_MAC);
+	LCD_WriteChar('\n');
 	LCD_WriteString("ETH: PHY ID 0x");
 	LCD_WriteInt(ETH_GetPHY_ID(),16);
 	LCD_WriteChar('\n');
@@ -79,6 +74,12 @@ void TEST_Init(void){
 }
 
 int main(void) {
+
+
+#ifdef __FREE_RTOS__
+
+	FreeRTOS_Test();
+#else
 
 	TEST_Init();
 
@@ -126,6 +127,6 @@ int main(void) {
 	#endif
 		TIME_DelayMs(100);
 	}
-
+#endif
 	return 0 ;
 }

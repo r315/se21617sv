@@ -27,3 +27,6 @@ Packages
 sources/DSO-138_Mod
 docs
 
+
+#uIP stuff
+sources/SE2_Lib/uip
