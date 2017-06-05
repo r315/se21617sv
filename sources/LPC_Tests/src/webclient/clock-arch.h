@@ -1,20 +1,3 @@
-#ifdef __MICRO_IP__
-
-#include <util.h>
-#include "timer.h"
-
-/*
- * @brief
- */
-int clock_time(void){
-	return  TIME_GetValue();
-}
-
-int clock_elapsed(struct timer *t){
-	return clock_time() - t->start;
-}
-
-#else
 /*
  * Copyright (c) 2006, Swedish Institute of Computer Science.
  * All rights reserved.
@@ -45,32 +28,13 @@ int clock_elapsed(struct timer *t){
  *
  * This file is part of the uIP TCP/IP stack
  *
- * $Id: clock-arch.c,v 1.2 2006/06/12 08:00:31 adam Exp $
+ * $Id: clock-arch.h,v 1.2 2006/06/12 08:00:31 adam Exp $
  */
 
-/**
- * \file
- *         Implementation of architecture-specific clock functionality
- * \author
- *         Adam Dunkels <adam@sics.se>
- */
+#ifndef __CLOCK_ARCH_H__
+#define __CLOCK_ARCH_H__
 
-#include "clock-arch.h"
-#include <sys/time.h>
+typedef int clock_time_t;
+#define CLOCK_CONF_SECOND 1000
 
-/*---------------------------------------------------------------------------*/
-clock_time_t
-clock_time(void)
-{
-  struct timeval tv;
-  struct timezone tz;
-
-  gettimeofday(&tv, &tz);
-
-  return tv.tv_sec * 1000 + tv.tv_usec / 1000;
-}
-/*---------------------------------------------------------------------------*/
-
-
-
-#endif
+#endif /* __CLOCK_ARCH_H__ */

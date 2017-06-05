@@ -54,9 +54,9 @@ enum{
 
 #define UIP_UDP_APPCALL dhcpc_server_appcall
 
-#define DHCP_LOG
+#define DHCP_DEBUG
 
-#ifdef DHCP_LOG
+#ifdef DHCP_DEBUG
 #define DHCP_LOG(m) dhcp_server_log(m)
 void dhcp_server_log(char *log);
 #else

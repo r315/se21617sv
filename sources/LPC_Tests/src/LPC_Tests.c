@@ -24,6 +24,8 @@
 #include <eeprom.h>
 #include <eth.h>
 
+#include "micro_ip.h"
+
 
 void Button_Test(void);
 void EEprom_Test(void);
@@ -63,14 +65,17 @@ void TEST_Init(void){
 	LCD_WriteString("EEPROM: Bus I2C");
 	LCD_WriteInt(EEPROM_GetIfNumber(),10);
 	LCD_WriteChar('\n');
-#if defined(__ETH__) || defined(__UIP__)
+#if defined(__ETH__) || defined(__MICRO_IP__)
 	ETH_Init();
+#elif defined(__UIP_WEB__)
+	ETH_Init();
+	MICRO_IP_Init();
+#endif
 	LCD_WriteString("ETH: MAC ");LCD_WriteString(IF_MAC);
 	LCD_WriteChar('\n');
 	LCD_WriteString("ETH: PHY ID 0x");
 	LCD_WriteInt(ETH_GetPHY_ID(),16);
 	LCD_WriteChar('\n');
-#endif
 }
 
 int main(void) {
@@ -90,7 +95,9 @@ int main(void) {
 
 	while(1) {
 
-	#ifdef __UIP__
+	#ifdef __UIP_WEB__
+		MICRO_IP_Task();
+	#elif defined(__MICRO_IP__)
 		uIP_Test();
 	#elif defined(__ETH__)
 		ETH_Test();

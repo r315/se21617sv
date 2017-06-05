@@ -29,5 +29,5 @@ docs
 
 
 #uIP stuff
-sources/SE2_Lib/uip
+sources/LPC_Tests/uIP_Library
 sources/FreeRTOS_Library

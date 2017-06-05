@@ -1,6 +1,9 @@
+#include <stdio.h>
 #include <eth.h>
 #include <stdio.h>
 #include <lcd.h>
+#include <string.h>
+
 
 uint8_t arprequest[]={
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x06, 0x23, 0x53, 0x45, 0x32, 0x23, 0x08, 0x06, 0x00, 0x01,
@@ -81,7 +84,7 @@ void arpReply(Arp *arp){
 	memcpy(&arp->ethernet.dstMAC, ETH_GetIF_MAC, 6);
 	swapBytes((uint8_t*)&arp->ethernet.dstMAC, (uint8_t*)&arp->ethernet.srcMAC, 6);
 	arp->opcode = 2;  //reply
-	setMAC((uint8_t*)&arp->targetMAC);
+	memcpy((uint8_t*)&arp->targetMAC, ETH_GetIF_MAC, 6);
 	swapBytes((uint8_t*)&arp->srcMAC, (uint8_t*)&arp->targetMAC, 6);
 	swapBytes((uint8_t*)&arp->srcIP, (uint8_t*)&arp->targetIP,4);
 	ETH_Send(arp,42);

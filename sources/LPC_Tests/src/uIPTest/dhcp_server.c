@@ -10,7 +10,7 @@ static struct dhcpc_state server_state;
 
 // echo "hello" >/dev/udp/169.254.9.161/68
 void dhcp_server_init(void){
-uip_ipaddr_t addr;
+/*uip_ipaddr_t addr;
 	  server_state.mac_addr = ETH_GetIF_MAC();
 	  server_state.mac_len  = 6;
 
@@ -24,7 +24,7 @@ uip_ipaddr_t addr;
 	    uip_udp_bind(server_state.conn, HTONS(DHCPC_SERVER_PORT));
 	  }
 
-	  PT_INIT(&server_state.pt);
+	  PT_INIT(&server_state.pt);*/
 }
 
 void dhcp_server_send_offer(void){

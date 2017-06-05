@@ -1,4 +1,4 @@
-#ifdef __UIP__
+#ifdef __MICRO_IP__
 
 #include <eth.h>
 #include "uip.h"

@@ -56,10 +56,11 @@ uint8_t mac[] = {0x06,0x23,0x53,0x45,0x32,0x23};
 void UIP_UTIL_PrintIp(uip_ipaddr_t ip);
 void dhcp_server_init(void);
 
+
+/* implementa o servidor http fornecido nos exemplos do uip */
 /*---------------------------------------------------------------------------*/
 int uIP_Test(void) {
 
-	//uIP_EEprom();
 
 	int i;
 	uip_ipaddr_t ipaddr;
@@ -71,7 +72,7 @@ int uIP_Test(void) {
 	//tapdev_init();
 	uip_init();
 
-	memcpy(&uip_ethaddr.addr,mac,6); //set physical address
+	memcpy(&uip_ethaddr.addr, ETH_GetIF_MAC(), 6); //set physical address into stack
 
 	uip_ipaddr(ipaddr, 169,254,9,161);
 	//uip_ipaddr(ipaddr, 0,0,0,0);
