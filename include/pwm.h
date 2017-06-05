@@ -1,21 +1,16 @@
 #ifndef _pwm_h_
 #define _pwm_h_
 
-#define PCLK1 1
-#define PCLK2 2
-#define PCLK4 0
-#define PCLK8 3
-
 #define PCPWM1 (1<<6)
 #define PCLK_PWM1 12
 
 #define TCR_TCEN  0
-#define TCR_PWMEN 3
+#define TCR_PWMEN 2  // errata on UM
 
-#define PWM_1 1
-#define PWM_2 2
-#define PWM_3 3
-#define PWM_4 4
+#define PWM_1 1     // P2.0(TXD1)
+#define PWM_2 2     // P2.1(RXD1)
+#define PWM_3 3     // P2.2(PWM1.3)
+#define PWM_4 4     // P2.3(PWM1.4)
 
 #define PWMMR0I 0
 #define PWMMR0R 1
@@ -39,14 +34,28 @@
 
 #define PWMENA1 9
 
+#define PWM_MAX_CH 4
+
 /**
- * @brief initialyze PWM giving TC clocks for one PWM period (Ton + Toff)
+ * @brief initialyze PWM with given frequency
  * 		ACTIVE Outputs: P2.1, P2.2, P2.3
+ * after initialization pwm channels must be enable
  * */
 void PWM_Init(uint32_t tcclk);
 
 /**
- * @brief set the duty for the given pwm channel
+ * @brief set the duty in % for the given pwm channel
  * */
-void PWM_Set(uint8_t channel, uint32_t duty);
+void PWM_Set(uint8_t channel, uint8_t duty);
+
+/**
+ * @brief Enable one PWM channel range(1:4)
+ **/
+ void PWM_Enable(uint8_t ch);
+ 
+ /**
+ * @brief Disable one PWM channel range(1:4)
+ **/
+ void PWM_Disable(uint8_t ch);
+ 
 #endif

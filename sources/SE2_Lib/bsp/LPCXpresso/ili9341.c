@@ -1,10 +1,24 @@
 #include <spi.h>
 #include <time_m3.h>
-//#include <lcd.h>
+#include <lcd.h>
 #include "ili9341.h"
 
 
 static uint16_t _width, _height;
+
+void LCD_Command(uint16_t data){
+    LCD_RS0;
+    LCD_CS0;
+    SPI_Send(data);
+    LCD_CS1;
+}
+
+void LCD_Data(uint16_t data){
+    LCD_RS1;
+    LCD_CS0;
+    SPI_Send(data);
+    LCD_CS1;
+}
 
 uint32_t LCD_GetWidth(void){
 	return _width;
@@ -28,12 +42,6 @@ void LCD_Bkl(uint32_t state){
     else LCD_BKL0;
 }
 
-void LCD_Data(uint16_t data){
-    LCD_RS1;
-    LCD_CS0;
-    SPI_Send(data);
-    LCD_CS1;
-}
 
 void LCD_Fill(uint32_t n, uint16_t data){
     LCD_RS1;
@@ -50,13 +58,6 @@ void LCD_IndexedColor(uint16_t *colors, uint8_t *index, uint32_t size){
         SPI_Send(colors[*index]);
         index += 1;
     }
-    LCD_CS1;
-}
-
-void LCD_Command(uint16_t data){
-    LCD_RS0;
-    LCD_CS0;
-    SPI_Send(data);
     LCD_CS1;
 }
 

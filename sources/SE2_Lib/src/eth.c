@@ -2,7 +2,7 @@
 #include <string.h>
 #include <time_m3.h>
 
-static char _ifmac[6];
+static uint8_t _ifmac[6];
 static EMAC_Memory *emac_memory;
 
 uint32_t ETH_Read(void *packet){
