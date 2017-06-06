@@ -13,6 +13,7 @@
 #include <stdint.h>
 
 extern volatile unsigned int systemticks;
+#define DelayMs(x) TIME_DelayMs(x)
 
 /**
 * @brief Faz a iniciação do SysTick de modo a que este incremente um contador de milisegundos

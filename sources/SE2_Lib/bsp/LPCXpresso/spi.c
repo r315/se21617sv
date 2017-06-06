@@ -2,8 +2,15 @@
 #include <spi.h>
 #include <gpio.h>
 
-#if defined(__LPC17XX__)
-#include <LPC17xx.h>
+
+
+#if defined(__LPC17XX__) || defined(__LPCXpresso__)
+#if defined(__USE_CMSIS)
+	#include <LPC17xx.h>
+#else
+	#include <lpc1768.h>
+	#include <clock.h>
+#endif
 
 void SSP_SetPCLK(uint32_t *pksel, uint8_t ck){
 	*pksel &= ~(3);  //set lowest clock

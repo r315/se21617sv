@@ -104,12 +104,9 @@
 #define MADCTL_BGR 0x08
 #define MADCTL_MH  0x04
 
+#define LCD_PORTRAIT  0
+#define LCD_LANDSCAPE 1
 
-/**
-* @brief Opens a window for writing data, data can be send immediately
-*        after this call
-**/
-void LCD_Window(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
 /**
 * @brief Fills n pixels with the same color

@@ -12,21 +12,9 @@
 
 #include <stdint.h>
 
-#define SPI0_ON (1<<8)
-#define SSP0_ON (1<<21)
-#define SSP1_ON (1<<10)
-
 #define SPI_PowerUp() SC->PCONP |= SPI0_ON
 #define SSP0_PowerUp() LPC_SC->PCONP |= SSP0_ON;
 #define SSP1_PowerUp() LPC_SC->PCONP |= SSP1_ON;
-
-/* SSPx pins */
-#define SSP0_CLK_PIN_MASK (3<<30)
-#define SSP0_CLK_PIN (2<<30)
-#define SSP0_PINS_MASK (0x0F<<2)
-#define SSP0_PINS (0x0A<<2)
-#define SSP1_PINS_MASK (0x3F<<14)
-#define SSP1_PINS (0x2A<<14)
 
 #define SSP0_ConfigPins()                             \
 	    LPC_PINCON->PINSEL0 &= ~(SSP0_CLK_PIN_MASK);  \
@@ -37,6 +25,20 @@
 #define SSP1_ConfigPins()                         \
 		LPC_PINCON->PINSEL0 &= ~(SSP1_PINS_MASK); \
 		LPC_PINCON->PINSEL0 |= SSP1_PINS;
+
+#define SPI_ConfigPins() PINCON->PINSEL0 = SPI0_PINS;
+
+#define SPI0_ON (1<<8)
+#define SSP0_ON (1<<21)
+#define SSP1_ON (1<<10)
+
+/* SSPx pins */
+#define SSP0_CLK_PIN_MASK (3<<30)
+#define SSP0_CLK_PIN (2<<30)
+#define SSP0_PINS_MASK (0x0F<<2)
+#define SSP0_PINS (0x0A<<2)
+#define SSP1_PINS_MASK (0x3F<<14)
+#define SSP1_PINS (0x2A<<14)
 
 #define SSP_CPOL (1<<6)  // idle level
 #define SSP_CPHA (1<<7)  // data valid
@@ -75,8 +77,6 @@
 /*Remark: LPC2104/05/06 and LPC2104/05/06/00 configured to operate as a SPI master MUST
 select SSEL functionality on P0.7 and have HIGH level on this pin in order to act as a master.*/
 #define SPI0_PINS     (0x55<<8)
-
-#define SPI_ConfigPins() PINCON->PINSEL0 = SPI0_PINS;
 
 #define SPI_MAX_CLK   8		//min pckl divider
 #define SPI_MAX_FREQ  0

@@ -68,7 +68,7 @@ void LCD_Clear(int color);
 /**
 * @brief controla a luz de fundo do lcd
 **/
-void LCD_Bkl(uint32_t state);
+void LCD_Bkl(uint8_t state);
 
 /**
  * @brief	Write a character with specified color.
@@ -92,7 +92,7 @@ void LCD_WriteInt(uint32_t value, uint32_t base);
 /**
  * @brief abre uma janela para estrita de dados.
  * */
-void LCD_Window(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+void LCD_Window(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
 
 /**
  * @brief Retorna a largura de um caractere em pixeis

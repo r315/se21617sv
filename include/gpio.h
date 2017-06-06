@@ -12,9 +12,9 @@
 
 #include <stdint.h>
 
-#if defined(__LPCX__)
+#if defined(__USE_CMSIS)
+	#include <LPC17xx.h>
 
-#include <LPC17xx.h>
 
 #define P0_0
 
@@ -48,6 +48,43 @@ void GPIO_SetState(uint32_t pin, uint8_t state);
 * @brief Set pin of GPIO0 as output
 **/
 #define GPIO_SetOutput(pin) LPC_GPIO0->FIODIR |= (1<<pin)
+
+
+#elif defined(__LPCXpresso__)
+#include <lpc1768.h>
+
+#define P0_0
+
+#define ON 1
+#define OFF 0
+#define GPIO_OUTPUT 1
+#define GPIO_HIGH   1
+#define GPIO_LOW    0
+
+/**
+* @brief Initialyze pin and set his state
+**/
+void GPIO_Init(uint32_t pin, uint8_t dir, uint8_t state);
+
+/**
+* @brief Set state of pin given the number of GPIO0
+**/
+void GPIO_SetState(uint32_t pin, uint8_t state);
+
+/**
+* @brief Set pin of GPIO0 to high level
+**/
+#define GPIO_Set(pin) GPIO0->FIOSET = (1<<pin)
+
+/**
+* @brief Set pin of GPIO0 to low level
+**/
+#define GPIO_Clr(pin) GPIO0->FIOCLR = (1<<pin)
+
+/**
+* @brief Set pin of GPIO0 as output
+**/
+#define GPIO_SetOutput(pin) GPIO0->FIODIR |= (1<<pin)
 
 
 #elif defined(__LPC2106__)

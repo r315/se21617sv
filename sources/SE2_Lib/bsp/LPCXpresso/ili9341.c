@@ -1,8 +1,11 @@
-#include <spi.h>
+#ifdef __USE_CMSIS
 #include <time_m3.h>
+#else
+#include <clock.h>
+#endif
+#include <spi.h>
 #include <lcd.h>
 #include "ili9341.h"
-
 
 static uint16_t _width, _height;
 
@@ -37,7 +40,7 @@ void LCD_Scroll(uint16_t sc){
 	LCD_Data(sc);
 }
 
-void LCD_Bkl(uint32_t state){
+void LCD_Bkl(uint8_t state){
     if(state) LCD_BKL1;
     else LCD_BKL0;
 }
@@ -61,7 +64,7 @@ void LCD_IndexedColor(uint16_t *colors, uint8_t *index, uint32_t size){
     LCD_CS1;
 }
 
-void LCD_Window(uint32_t x, uint32_t y, uint32_t w, uint32_t h){
+void LCD_Window(uint16_t x, uint16_t y, uint16_t w, uint16_t h){
     LCD_Command(CASET);  
     //LCD_Data((x<<8) | (x + w -1));   
     LCD_Data(x);
@@ -81,11 +84,11 @@ void LCD_Init(void){
         LCD_BKL0;
 
         LCD_RST0;
-        TIME_DelayMs(10);
+        DelayMs(10);
         LCD_RST1;
         
         LCD_Command(SWRST); 
-        TIME_DelayMs(5);
+        DelayMs(5);
         LCD_Command(DISPOFF); 
         
         LCD_Command(PCONB);  
@@ -152,10 +155,10 @@ void LCD_Init(void){
         LCD_Data(0x00);    
 
         LCD_Command(SLPOUT);    //Exit Sleep 
-        TIME_DelayMs(120);
+        DelayMs(120);
                 
         LCD_Command(DISPON);    //Display on 
-        TIME_DelayMs(120);
+        DelayMs(120);
         LCD_Command(RAMWR);
 
         _width  = TFT_W;
