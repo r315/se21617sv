@@ -26,7 +26,7 @@
  */
 
 /*Define Interface Mac Address Here */
-#define IF_MAC  "06:23:53:45:32:23" //.#SE2#
+#define IF_MAC  (uint8_t*)"06:23:53:45:32:23" //.#SE2#
 
 #define ETH_ON (1<<30)
 

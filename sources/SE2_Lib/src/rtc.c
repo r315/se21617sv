@@ -1,6 +1,6 @@
 #include <rtc.h>
 
-#if defined(__LPCX__) || defined(__BB__)
+#if defined(__LPCXpresso__)
 
 void RTC_Init(struct tm *dateTime){
 	RTC_PowerUp();

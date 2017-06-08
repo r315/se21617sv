@@ -32,6 +32,14 @@
 #endif
 #endif
 
+#define PCLK_TIMER0	2
+#define PCLK_TIMER1	4
+#define PCLK_TIMER2	12
+#define PCLK_TIMER3	14
+#define PCLK_1 		1
+#define PCLK_2 		2
+#define PCLK_4 		0
+#define PCLK_8 		3
 
 uint32_t CLOCK_GetPCLK(void);
 uint32_t CLOCK_GetCCLK(void);

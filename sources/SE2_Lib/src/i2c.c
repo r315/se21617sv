@@ -40,7 +40,7 @@ void I2C_Init(I2C_Controller *i2cifc, uint8_t ifNumber, uint32_t freq, uint8_t d
 
 	i2cifc->interface->I2CONSET = I2C_I2EN ;
 	i2cifc->interface->I2CONCLR = I2C_STA | I2C_STO | I2C_SI;
-	i2cifc->status = IDLE;
+	i2cifc->status = I2C_IDLE;
 }
 
 /**
@@ -78,7 +78,7 @@ int8_t I2C_StateMachine(I2C_Controller *i2cifc){
 			i2cifc->interface->I2CONSET = I2C_AA;
 			i2cifc->count--;
 		}else{
-			i2cifc->status = IDLE;
+			i2cifc->status = I2C_IDLE;
 			i2cifc->interface->I2CONSET = I2C_STO;
 		}
 		i2cifc->interface->I2CONCLR = I2C_SI;
@@ -101,30 +101,30 @@ int8_t I2C_StateMachine(I2C_Controller *i2cifc){
 		break;
 
 	case I2C_SLA_W_NACK:
-		i2cifc->status = IDLE;
+		i2cifc->status = I2C_IDLE;
 		i2cifc->interface->I2CONCLR = I2C_STA | I2C_SI;
 		i2cifc->interface->I2CONSET = I2C_STO;
 		break;
 
 	case I2C_DTA_W_NACK:
-		i2cifc->status = IDLE;
+		i2cifc->status = I2C_IDLE;
 		i2cifc->interface->I2CONCLR = I2C_SI;
 		i2cifc->interface->I2CONSET = I2C_STO;
 		break;
 
 	case I2C_SLA_R_NACK:
-		i2cifc->status = IDLE;
+		i2cifc->status = I2C_IDLE;
 		i2cifc->interface->I2CONCLR = I2C_STA | I2C_SI;
 		i2cifc->interface->I2CONSET = I2C_STO;
 		break;
 	case I2C_DTA_R_NACK:
-		i2cifc->status = IDLE;
+		i2cifc->status = I2C_IDLE;
 		i2cifc->interface->I2CONCLR = I2C_SI;
 		i2cifc->interface->I2CONSET = I2C_STO;
 		break;
 
 	case I2C_SLA_LOST:
-		i2cifc->status = IDLE;
+		i2cifc->status = I2C_IDLE;
 		i2cifc->interface->I2CONCLR = I2C_SI | I2C_STA | I2C_STO;
 		break;
 
@@ -142,7 +142,7 @@ int8_t I2C_ClycleStateMachine(I2C_Controller *i2cifc, uint8_t *data, uint32_t si
 	i2cifc->data = data;
 	i2cifc->interface->I2CONSET = I2C_STA;
 
-	while(I2C_StateMachine(i2cifc) != IDLE ){
+	while(I2C_StateMachine(i2cifc) != I2C_IDLE ){
 		while(!(i2cifc->interface->I2CONSET & I2C_SI));
 	}
 	return i2cifc->status;

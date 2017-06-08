@@ -12,6 +12,10 @@
 
 #include <gpio.h>
 
+#define LCD_W LCD_GetWidth()   //240
+#define LCD_H LCD_GetHeight()  //320
+#define LCD_SIZE LCD_GetSize() //LCD_W * LCD_H
+
 #define TFT_W 240
 #define TFT_H 320
 
@@ -106,6 +110,8 @@
 
 #define LCD_PORTRAIT  0
 #define LCD_LANDSCAPE 1
+#define LCD_REVERSE_PORTRAIT  2
+#define LCD_REVERSE_LANDSCAPE 3
 
 
 /**

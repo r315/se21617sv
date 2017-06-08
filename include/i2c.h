@@ -24,7 +24,7 @@
 #define I2C_DEFAULT_CLOCK 100000 //Standard 100Khz
 
 enum _i2cStates{
-	IDLE = 0,
+	I2C_IDLE = 0,
 	REPEATED_START,    //0x01
 	SLA_READ,          //0x02
 	SLA_WRITE,         //0x03

@@ -1,8 +1,6 @@
 #include <spi.h>
 #include <lcd.h>
 
-#include "ili9341.h"
-
 #define FONT (unsigned char *)font8x16
 extern const unsigned char font8x16[97][16];
 static uint32_t _x, _y;

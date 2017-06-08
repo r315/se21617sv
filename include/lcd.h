@@ -11,10 +11,7 @@
 #define _lcd_h_
 
 #include <stdint.h>
-
-#define LCD_W LCD_GetWidth()   //240
-#define LCD_H LCD_GetHeight()  //320
-#define LCD_SIZE LCD_GetSize() //LCD_W * LCD_H
+#include <ili9341.h>
 
 /* basic color constants */
 #define RGB(r,g,b)  (int)((r<<11) | (g<<5) | b)

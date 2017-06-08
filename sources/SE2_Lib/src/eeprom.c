@@ -70,8 +70,8 @@ int8_t I2C_EEpromStateMachine(Eeprom *eeprom){
 					eeprom->count--;
 				}else{
 					eeprom->i2cif->I2CONSET = I2C_STO;
-					eeprom->status = IDLE;
-					eeprom->operation = IDLE;
+					eeprom->status = I2C_IDLE;
+					eeprom->operation = I2C_IDLE;
 				}
 				eeprom->i2cif->I2CONCLR = I2C_SI;
 				break;
@@ -100,33 +100,33 @@ int8_t I2C_EEpromStateMachine(Eeprom *eeprom){
 			eeprom->i2cif->I2CONCLR = I2C_STA | I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
 			eeprom->status = ERROR_SLA_W_NACK;
-			eeprom->operation = IDLE;
+			eeprom->operation = I2C_IDLE;
 			break;
 
 		case I2C_DTA_W_NACK:
 			//eeprom->i2cif->I2CONCLR = I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
 			eeprom->status = ERROR_DTA_W_NACK;
-			eeprom->operation = IDLE;
+			eeprom->operation = I2C_IDLE;
 			break;
 
 		case I2C_SLA_R_NACK:
 			eeprom->i2cif->I2CONCLR = I2C_STA | I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
 			eeprom->status = ERROR_SLA_R_NACK;
-			eeprom->operation = IDLE;
+			eeprom->operation = I2C_IDLE;
 			break;
 
 		case I2C_DTA_R_NACK:
 			*(eeprom->data) = eeprom->i2cif->I2DAT;  //save last received byte
 			eeprom->i2cif->I2CONCLR = I2C_SI;
 			eeprom->i2cif->I2CONSET = I2C_STO;
-			eeprom->operation = IDLE;
+			eeprom->operation = I2C_IDLE;
 			break;
 
 		case I2C_SLA_LOST:
 			eeprom->i2cif->I2CONCLR = I2C_SI | I2C_STA | I2C_STO;
-			eeprom->operation = IDLE;
+			eeprom->operation = I2C_IDLE;
 			break;
 
 		case I2C_NO_INFO:
@@ -144,7 +144,7 @@ int8_t EEPROM_Start(uint16_t address, uint8_t *data, uint32_t size){
 	eeprom.data = data;
 	eeprom.i2cif->I2CONSET = I2C_STA;
 
-	while(I2C_EEpromStateMachine(&eeprom) != IDLE ){
+	while(I2C_EEpromStateMachine(&eeprom) != I2C_IDLE ){
 		while(!(eeprom.i2cif->I2CONSET & I2C_SI));
 	}
 	return eeprom.status;
