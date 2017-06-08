@@ -252,12 +252,12 @@ void newGame(GameData *gd) {
 }
 
 
-void updatePlayerName(uint8_t *name) {
+void updatePlayerName(char *name) {
 	LCD_Goto(SCREEN_SX + 30 + 12 * 8, SCREEN_SY + 50);
 	LCD_WriteString(gamedata->playername);
 }
 
-void selectPlayerName(uint8_t *pname, uint8_t curchar, int8_t inc) {
+void selectPlayerName(char *pname, uint8_t curchar, int8_t inc) {
 	uint8_t ch = *(pname + curchar);
 	ch += inc;
 	if (ch >= 'A' && ch <= 'Z') {

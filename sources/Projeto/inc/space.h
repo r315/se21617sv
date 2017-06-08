@@ -64,7 +64,7 @@ typedef struct _gameData{
 	uint8_t lives;
     uint8_t alienscount;
     uint8_t end;
-    uint8_t playername[4];
+    char playername[4];
     Sprite tank;
 	Sprite bonusalien;
     Sprite aliens[MAX_ALIENS];

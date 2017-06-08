@@ -11,5 +11,7 @@
 
 int saveData(void *data, int dataSize);
 int restoreData(void *data, int dataSize);
+void saveTopScore(uint32_t score, uint32_t *scorestab);
+void displaySaveResult(uint32_t res);
 
 #endif

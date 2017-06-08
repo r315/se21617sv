@@ -5,8 +5,9 @@
 #include <rtc.h>
 #include <button.h>
 #include <eth.h>
+#include <micro_ip.h>
 
-#if defined(__LPCX__)
+#if defined(__LPCXpresso__)
 #include <eeprom.h>
 #include <spi.h>
 #elif defined(__BB__)
@@ -20,6 +21,8 @@
 
 const int defaultRtc[]={0,0,0,0,0,2010,0,0,0,0,0};
 
+#include <FreeRTOS.h>
+#include <task.h>
 
 
  /**
@@ -27,7 +30,7 @@ const int defaultRtc[]={0,0,0,0,0,2010,0,0,0,0,0};
   * */
 void SYS_Init(void){
 
-	#if defined(__LPCX__)
+	#if defined(__LPCXpresso__)
 
 	TIME_Init();
 
@@ -62,6 +65,8 @@ void SYS_Init(void){
     LCD_Clear(BLACK);
     LCD_Bkl(ON);
 
+    LCD_Rotation(LCD_REVERSE_PORTRAIT);
+
 	LCD_SetColors(YELLOW, BLACK);
 	LCD_WriteString("Hello\n");
 
@@ -76,8 +81,6 @@ void SYS_Init(void){
 	LCD_WriteInt(EEPROM_GetIfNumber(),10);
 	LCD_WriteChar('\n');
 
-
-
 	ETH_Init();
 	LCD_WriteString("ETH: MAC 06:05:04:03:02:01\n");
 	LCD_WriteString("ETH: PHY ID 0x");
@@ -86,4 +89,15 @@ void SYS_Init(void){
 
 	RTC_Init(0); //dummy value, rtc value is restored from flash
 	LCD_WriteString("RTC Initialized: NOT SET!\n");
+
+	ETH_Init();
+
+	LCD_WriteString("ETH: MAC ");LCD_WriteString(IF_MAC);
+	LCD_WriteChar('\n');
+	LCD_WriteString("ETH: PHY ID 0x");
+	LCD_WriteInt(ETH_GetPHY_ID(),16);LCD_WriteChar('\n');
+
+	MICRO_IP_Init();
+
+	TIME_DelayMs(1000);
 }
