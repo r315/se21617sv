@@ -37,7 +37,9 @@ uip_ipaddr_t ipaddr;
 
 	 uiplib_ipaddrconv(MICRO_IP_DNS_ADDR, (uint8_t *)ipaddr);
 	 resolv_conf(ipaddr);										//Set DNS Server Address
-	 resolv_query("http://adeetc.thothapp.com");
+	 //resolv_query("www.google.com");
+	 //resolv_query("http://adeetc.thothapp.com");
+	 resolv_query("retro.hackaday.com");
 }
 
 void MICRO_IP_Task(void){
@@ -110,7 +112,8 @@ void resolv_found(char *name, u16_t *ipaddr) {
 		printf("Found name '%s' = %d.%d.%d.%d\n", name, htons(ipaddr[0]) >> 8,
 				htons(ipaddr[0]) & 0xff, htons(ipaddr[1]) >> 8,
 				htons(ipaddr[1]) & 0xff);
-		webclient_get("http://adeetc.thothapp.com", 80, "/api/v1/classes/634");
+		//webclient_get("http://adeetc.thothapp.com", 80, "/api/v1/classes/634");
+		webclient_get("retro.hackaday.com",80,"/");
 	}
 }
 
@@ -128,5 +131,6 @@ void webclient_connected(void) {
 	WEB_log("Webclient: connected, waiting for data...\n");
 }
 void webclient_datahandler(char *data, u16_t len) {
-	printf("Webclient: got %d bytes of data.\n", len);
+	printf("Webclient: got %d bytes of data.\n %s", len,data);
+
 }
