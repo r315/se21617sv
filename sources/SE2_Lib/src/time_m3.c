@@ -31,16 +31,17 @@ uint32_t TIME_GetValue(void){
 	return LPC_TIM0->TC;
 }
 void TIMER_SetClockDivider(uint8_t ckdiv){
-    LPC_SC->PCLKSEL0 = ((ckdiv&3)<<PCLK_TIMER0);
+	LPC_SC->PCLKSEL0 &= ~(3<<PCLK_TIMER0);
+    LPC_SC->PCLKSEL0 |= ((ckdiv&3)<<PCLK_TIMER0);
 }
 
 uint32_t TIME_Elapsed(uint32_t ticks){
-	return TIME_GetValue() - ticks;
+	return LPC_TIM0->TC - ticks;
 }
 
 void TIME_DelayMs(uint32_t ms){
 uint32_t endtime = TIME_GetValue() + ms;
-	while(TIME_GetValue() < endtime);
+	while(LPC_TIM0->TC < endtime);
 }
 #endif
 

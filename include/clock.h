@@ -9,7 +9,7 @@
 #ifndef _clock_h_
 #define _clock_h_
 
-#if defined(__LPC17XX__)
+#if defined(__ARM_ARCH_7M__)
 #include <LPC17xx.h>
 
 #else
@@ -30,7 +30,8 @@
 #else
 #define CLOCK_SetAPBDIV(x) SC->APBDIV = x
 #endif
-#endif
+
+#endif  /* __ARM_ARCH_7M__ */
 
 #define PCLK_TIMER0	2
 #define PCLK_TIMER1	4

@@ -12,6 +12,8 @@
 
 #include <stdint.h>
 
+#if defined(__USE_CMSIS)
+
 #define SPI_PowerUp() SC->PCONP |= SPI0_ON
 #define SSP0_PowerUp() LPC_SC->PCONP |= SSP0_ON;
 #define SSP1_PowerUp() LPC_SC->PCONP |= SSP1_ON;
@@ -27,6 +29,25 @@
 		LPC_PINCON->PINSEL0 |= SSP1_PINS;
 
 #define SPI_ConfigPins() PINCON->PINSEL0 = SPI0_PINS;
+
+#else
+#define SPI_PowerUp() SC->PCONP |= SPI0_ON
+#define SSP0_PowerUp() LPC_SC->PCONP |= SSP0_ON;
+#define SSP1_PowerUp() LPC_SC->PCONP |= SSP1_ON;
+
+#define SSP0_ConfigPins()                             \
+	    LPC_PINCON->PINSEL0 &= ~(SSP0_CLK_PIN_MASK);  \
+	    LPC_PINCON->PINSEL1 &= ~(SSP0_PINS_MASK);     \
+	    LPC_PINCON->PINSEL0 |= SSP0_CLK_PIN;          \
+	    LPC_PINCON->PINSEL1 |= SSP0_PINS;
+
+#define SSP1_ConfigPins()                         \
+		LPC_PINCON->PINSEL0 &= ~(SSP1_PINS_MASK); \
+		LPC_PINCON->PINSEL0 |= SSP1_PINS;
+
+#define SPI_ConfigPins() PINCON->PINSEL0 = SPI0_PINS;
+
+#endif
 
 #define SPI0_ON (1<<8)
 #define SSP0_ON (1<<21)
@@ -52,7 +73,7 @@
 #define SSP_8BIT  8
 #define SSP_16BIT 16
 
-#define SSP_MAX_CLK 2
+#define SSP_MAX_CLK 10
 #define SSP_MIN_CLK 254
 
 #define PCLK_SSP0 10

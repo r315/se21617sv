@@ -121,10 +121,6 @@
 **/
 void LCD_Fill(uint32_t n, uint16_t color);
 
-/**
-* @brief
-**/
-void LCD_Data16(uint16_t data);
 
 /**
  * @brief

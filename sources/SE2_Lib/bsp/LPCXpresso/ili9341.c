@@ -4,8 +4,8 @@
 #include <clock.h>
 #endif
 #include <spi.h>
-#include <lcd.h>
-#include "ili9341.h"
+
+#include <ili9341.h>
 
 static uint16_t _width, _height;
 

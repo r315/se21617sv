@@ -2,50 +2,55 @@
 #include <spi.h>
 #include <gpio.h>
 
+#include <clock.h>
 
-
-#if defined(__LPC17XX__) || defined(__LPCXpresso__)
+#if defined(__ARM_ARCH_7M__)
 #if defined(__USE_CMSIS)
 	#include <LPC17xx.h>
 #else
 	#include <lpc1768.h>
-	#include <clock.h>
 #endif
 
-void SSP_SetPCLK(uint32_t *pksel, uint8_t ck){
-	*pksel &= ~(3);  //set lowest clock
+void SSP_SetPCLK(LPC_SSP_TypeDef *sspx, uint8_t ck){
+uint8_t sBit;
+uint32_t *pksel;
+
+	if((uint32_t)sspx & (1<<15)){ 		// test for ssp0 or ssp1
+		pksel = (uint32_t*)&LPC_SC->PCLKSEL1;
+		sBit = PCLK_SSP0;
+	}else{
+		pksel = (uint32_t*)&LPC_SC->PCLKSEL0;
+		sBit = PCLK_SSP1;
+	}
+
+	*pksel &= ~(3<<sBit);  //set default pclock
 
 	switch(ck){
-		case 1: *pksel |= 1; break; //SystemCoreClock
-		case 2: *pksel |= 2; break; //SystemCoreClock / 2
-		case 4: *pksel |= 0; break; //SystemCoreClock / 4
+		case 1: *pksel |= (PCLK_1<<sBit); break; //SystemCoreClock
+		case 2: *pksel |= (PCLK_2<<sBit); break; //SystemCoreClock / 2
+		case 4: *pksel |= (PCLK_4<<sBit); break; //SystemCoreClock / 4
 		default:
-		case 8: *pksel |= 3; break; //SystemCoreClock / 8
+		case 8: *pksel |= (PCLK_8<<sBit); break; //SystemCoreClock / 8
 	}
 }
 
 void SSP_Init(LPC_SSP_TypeDef *sspx, uint32_t speed, uint8_t dss){
-uint32_t *pksel, cpsr;
+uint32_t cpsr;
 uint8_t ck;
 
 	sspx->CR0 = 0;
-	sspx->CR1 = 0;
-
-	if((uint32_t)sspx & (1<<15)) // test for ssp0 or ssp1
-		pksel = (uint32_t*)&LPC_SC->PCLKSEL1;
-	else
-		pksel = (uint32_t*)&LPC_SC->PCLKSEL0;
+	sspx->CR1 = 0;	
 
 	for(ck = 8; ck > 0; ck >>= 1){          //calculate ssp prescaler
 		cpsr = (SystemCoreClock/ck)/speed;  // CPSR = cclk/PCLKSEL/spi speed
 		if((cpsr < SSP_MIN_CLK) && (cpsr > SSP_MAX_CLK)){
-			SSP_SetPCLK(pksel, ck);
+			SSP_SetPCLK(sspx, ck);			
 			break;
 		}
-	}
+	}	
 
 	if(!ck){
-		SSP_SetPCLK(pksel, ck);
+		SSP_SetPCLK(sspx, ck);
 		cpsr = SSP_MIN_CLK;
 	}
 
@@ -69,7 +74,6 @@ uint16_t SPI_Send(uint16_t data){
 
 #else
 #include <lpc2106.h>
-#include <clock.h>
 
 /**
 *	default init 8-bit transfer
@@ -77,10 +81,11 @@ uint16_t SPI_Send(uint16_t data){
 *   Note default pclk = cclk/4
 **/
 void SPI_Init(int frequency, int bitData){
-int spccr;	
+int spccr;
 
 	SPI_PowerUp();
-	PINCON->PINSEL0 = SPI0_PINS;
+	PINCON->PINSEL0 &= ~(0xFF<<8);
+	PINCON->PINSEL0 |= SPI0_PINS;
 	SPI0->SPCR = SPI0_MSTR | SPI0_CPOL | SPI0_CPHA | SPI0_EN_NBITS | (bitData << 8);
 	
 	if(frequency){

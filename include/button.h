@@ -12,6 +12,14 @@
 
 #include <stdint.h>
 
+/*
+ * @brief estrutura que detem o estado e o valor do botão
+ * de modo a simplificar a logica da maquina de estados do botão
+ * foi separado o estado e o valor do botao em duas variaveis
+ * assim a variavel cur contem a mascara correspondente ao botão precionado
+ * e a variavel events o evento do botão. Para teste de uma tecla premida
+ * basta verificar o evento e testar cur com a mascara do botão pretendido
+ */
 typedef struct{
 	uint32_t cur;
 	uint32_t last;
@@ -27,7 +35,38 @@ enum Bevent{
     BUTTON_HOLD,
     BUTTON_RELEASED	
 };
-#if defined(__BB__)
+
+#if defined(__LPCXpresso__)
+#include <LPC17xx.h>
+/**
+* @brief Button connections
+*		P0.26  Left
+*		P0.3   Right
+*		P0.2   Fire
+*       P0.21  Up
+*       P0.27  Down
+**/
+#define BUTTON_F (1<<26)
+#define BUTTON_S (1<<3)
+#define BUTTON_R (1<<2)
+#define BUTTON_L (1<<21)
+#define BUTTON_D (1<<1)
+
+#define BUTTON_A BUTTON_F
+#define BUTTON_U BUTTON_S
+#define BUTTON_C BUTTON_F
+
+#define BUTTON_MASK (BUTTON_U | BUTTON_D | BUTTON_L | BUTTON_R | BUTTON_C)
+
+#define BUTTON_Capture()   (~(LPC_GPIO0->FIOPIN) & BUTTON_MASK);
+#define BUTTON_SetInput(x) LPC_GPIO0->FIODIR &= ~(x)
+
+#define BUTTON_UP    BUTTON_U
+#define BUTTON_DOWN  BUTTON_D
+#define BUTTON_LEFT  BUTTON_L
+#define BUTTON_RIGHT BUTTON_R
+
+#elif defined(__LPC1768_H__)
 /**
 * @brief Button connections
 *		P0.26  Left
@@ -44,35 +83,6 @@ enum Bevent{
 
 #define BUTTON_GetValue()  LPC_GPIO0->FIOPIN
 #define BUTTON_SetInput(x) LPC_GPIO0->FIODIR &= ~(x)
-
-#elif defined(__LPCXpresso__)
-#include <LPC17xx.h>
-/**
-* @brief Button connections
-*		P0.26  Left
-*		P0.2   Fire   (A)
-*		P0.3   Right
-*       P0.21  Save   (Up)
-*       P0.27  Down
-**/
-#define BUTTON_F (1<<26)
-#define BUTTON_S (1<<3)
-#define BUTTON_R (1<<2)
-#define BUTTON_L (1<<21)
-
-#define BUTTON_A BUTTON_F
-#define BUTTON_U BUTTON_S
-#define BUTTON_D (1<<1)
-
-#define BUTTON_MASK (BUTTON_U | BUTTON_D | BUTTON_L | BUTTON_R | BUTTON_A)
-
-#define BUTTON_Capture()   (~(LPC_GPIO0->FIOPIN) & BUTTON_MASK);
-#define BUTTON_SetInput(x) LPC_GPIO0->FIODIR &= ~(x)
-
-#define BUTTON_UP    BUTTON_U
-#define BUTTON_DOWN  BUTTON_D
-#define BUTTON_LEFT  BUTTON_L
-#define BUTTON_RIGHT BUTTON_R
 
 #else
 /**
