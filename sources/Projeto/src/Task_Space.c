@@ -1,13 +1,11 @@
 #include <string.h>
 #include <lcd.h>
 #include <stdint.h>
-#include <button.h>
-#include "proj.h"
 #include "space.h"
 #include "../sprites/sprites.h"
-
-#include <gpio.h>
-#include <spi.h>
+#include <misc.h>
+//#include <spi.h>
+#include <Task_Common.h>
 
 #include <util.h>
 
@@ -242,14 +240,7 @@ void updateLives(uint8_t lives) {
 	LCD_WriteInt(lives, 10);
 }
 
-void newGame(GameData *gd) {
-	loadTank(&gd->tank);
-	loadAliens(gd->aliens, Aliens0, SCREEN_TOP + SPRITE_H);
-	gd->alienscount = MAX_ALIENS;
-	gd->lives = MAX_LIVES;
-	gd->state = RUNNING;
-	gd->score = 0;
-}
+
 
 
 void updatePlayerName(char *name) {
@@ -285,7 +276,7 @@ void showScoreTable(void) {
 }
 
 
-void popSpace(void *ptr) {
+void SPACE_Init(void *ptr) {
 
 	gamedata = (GameData*) ptr;
 
@@ -322,38 +313,40 @@ void popSpace(void *ptr) {
 	updateLives(gamedata->lives);
 }
 
-void countFps(void) {
-	static int secondsCount = 0;
-	static uint8_t fps = 0;
-	if (TIME_GetValue() > secondsCount) {
-		LCD_Goto(0, 0);
-		LCD_WriteInt(fps, 10);
-		secondsCount = TIME_GetValue() + 1000;
-		fps = 0;
-	}
-	fps++;
+void SPACE_NewGame(GameData *gd) {
+	loadTank(&gd->tank);
+	loadAliens(gd->aliens, Aliens0, SCREEN_TOP + SPRITE_H);
+	gd->alienscount = MAX_ALIENS;
+	gd->lives = MAX_LIVES;
+	gd->state = RUNNING;
+	gd->score = 0;
 }
 
-void space(int button) {
+void Task_Space(void *ptr) {
 	uint8_t n, randalien;
-	static int8_t dir = ALIENS_MOVE_SPEED;
-	static uint8_t speed = SPEED;
-	static uint8_t alienframe;
+	BTN_Event button;
+	int8_t dir = ALIENS_MOVE_SPEED;
+	uint8_t speed = SPEED;
+	uint8_t alienframe;
 	uint16_t alienpoints;
-	static uint32_t frametime;
+	uint32_t frametime = 0;
 
+	SPACE_Init(ptr);
+
+	while(1){
+		button = BUTTON_QueueGet();
 	if (gamedata->state == ENDED) {
-		if (BUTTON_GetEvents() == BUTTON_PRESSED) {
-			switch (button) {
+		if (button.event == BUTTON_PRESSED) {
+			switch (button.value) {
 			case BUTTON_U:
 				selectPlayerName(gamedata->playername, alienframe, 1);
 				break;
 			case BUTTON_D:
 				selectPlayerName(gamedata->playername, alienframe, -1);
 				break;
-			case BUTTON_F:
+			case BUTTON_C:
 				if ((++alienframe) == 3) {
-					newGame(gamedata);
+					SPACE_NewGame(gamedata);
 					clearGame();
 				}
 				break;
@@ -363,38 +356,45 @@ void space(int button) {
 		}
 	} else {
 		if (TIMER0_GetValue() > frametime) {
-			switch (button) {
+			switch (button.value) {
+
 			case BUTTON_L:
-				moveTank(&gamedata->tank, -1);
+				moveTank(&gamedata->tank, -1);							//Move nave para esquerda
 				break;
+
 			case BUTTON_R:
-				moveTank(&gamedata->tank, 1);
+				moveTank(&gamedata->tank, 1);							//Move nave para direita
 				break;
-			case BUTTON_F:
-				newProjectile(gamedata->tankprojectiles,
+
+			case BUTTON_U:
+				newProjectile(gamedata->tankprojectiles,				//Dispara um projectil
 						gamedata->tank.x + SPRITE_W / 2,
 						gamedata->tank.y - PROJECTILE_H, -1, PINK);
 				break;
-
-			case (BUTTON_F | BUTTON_L):
+			//TODO: optimizar criando uma funçao para mover nave
+			case (BUTTON_U | BUTTON_L):									//Move nave para a esquerda e dispara um projectil
 				moveTank(&gamedata->tank, -1);
 				newProjectile(gamedata->tankprojectiles,
 						gamedata->tank.x + SPRITE_W / 2,
 						gamedata->tank.y - PROJECTILE_H, -1, PINK);
 				break;
 
-			case (BUTTON_F | BUTTON_R):
+			case (BUTTON_U | BUTTON_R):									//Move nave para a direita e dispara um projectil
 				moveTank(&gamedata->tank, 1);
 				newProjectile(gamedata->tankprojectiles,
 						gamedata->tank.x + SPRITE_W / 2,
 						gamedata->tank.y - PROJECTILE_H, -1, PINK);
 				break;
+
+			case BUTTON_C:
+				TASK_EXIT;
+				return;
 
 			default:
 				break;
 			}
 
-			//move aliens
+			//movimentação dos aliens
 			if (!(--speed)) {
 				dir = moveAliens(gamedata->aliens,
 						(alienframe & 4) ? Aliens0 : Aliens1, dir);
@@ -405,13 +405,14 @@ void space(int button) {
 				speed = SPEED;
 				alienframe++;
 				if (checkAliensOnBottom(gamedata->aliens, &gamedata->tank))
-					newGame(gamedata);
+					SPACE_NewGame(gamedata);
 			}
 
-			//erase player projectiles
+			// apaga os projeteis do jogador
 			eraseProjectils(gamedata->tankprojectiles,
 			TANK_MAX_PROJECTILES);
-			// move player projectil and update score
+
+			// move os projeteis do jogador e verifica se colidiu com algum alien
 			for (n = 0; n < TANK_MAX_PROJECTILES; n++) {
 				moveProjectile(&gamedata->tankprojectiles[n]);
 				alienpoints = checkPlayerHit(&gamedata->tankprojectiles[n],
@@ -427,10 +428,11 @@ void space(int button) {
 				}
 			}
 
-			// erase aliens projectiles
+			// apaga os projecteis dos aliens
 			eraseProjectils(gamedata->alienprojectiles,
 			ALIENS_MAX_PROJECTILES);
-			//move aliens projectiles
+
+			//move os projeteis disparados pelos aliens e testa se algum colidiu com o jogador
 			for (n = 0; n < ALIENS_MAX_PROJECTILES; n++) {
 				moveProjectile(&gamedata->alienprojectiles[n]);
 				if (checkAlienHit(&gamedata->alienprojectiles[n],
@@ -447,8 +449,9 @@ void space(int button) {
 
 			updateScore(gamedata->score);
 
-			countFps();
-			frametime = TIMER0_GetValue() + 10;  //50fps
+			MISC_countFps();
+			frametime += SPACE_UPDATE_RATE;
 		}
+	}
 	}
 }

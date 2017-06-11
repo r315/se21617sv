@@ -6,6 +6,7 @@
 #include <button.h>
 #include <eth.h>
 #include <micro_ip.h>
+#include <util.h>
 
 #if defined(__LPCXpresso__)
 #include <eeprom.h>
@@ -17,13 +18,15 @@
 #include <spi.h>
 #endif
 
-#include <util.h>
+#include <misc.h>
+#include <FreeRTOS.h>
+#include <task.h>
+#include <Task_Common.h>
+#include <Task_Button.h>
 
 const int defaultRtc[]={0,0,0,0,0,2010,0,0,0,0,0};
 
-#include <FreeRTOS.h>
-#include <task.h>
-
+SaveData saveddata;
 
  /**
   * @brief peripheral initialization
@@ -65,7 +68,7 @@ void SYS_Init(void){
     LCD_Clear(BLACK);
     LCD_Bkl(ON);
 
-    LCD_Rotation(LCD_REVERSE_PORTRAIT);
+    //LCD_Rotation(LCD_REVERSE_PORTRAIT);
 
 	LCD_SetColors(YELLOW, BLACK);
 	LCD_WriteString("Hello\n");
@@ -101,3 +104,39 @@ void SYS_Init(void){
 
 	TIME_DelayMs(1000);
 }
+
+/**
+ * @brief Main Function, initialize all hardware and start tasks
+ **/
+int main(void){
+portBASE_TYPE xres;
+	 SYS_Init();
+
+	    LCD_WriteString("Starting RTOS Tasks\n");
+
+	    xres = xTaskCreate(Task_Button, "Button", TASK_BUTTON_HEAP , NULL, TASK_BUTTON_PRIORITY, NULL );
+		if(!xres){
+			LCD_WriteString("Unable to start Button Task: ");
+			LCD_WriteInt(xres,10);
+		}
+
+	    xres = xTaskCreate(Task_Net, "Network", TASK_NET_HEAP, NULL, TASK_NET_PRIORITY, NULL );
+	    if(!xres){
+	    	LCD_WriteString("Unable to start Micro ip Task: ");
+	    	LCD_WriteInt(xres,10);
+	    }
+
+	    xres = xTaskCreate(Task_Main, "Main", TASK_MAIN_HEAP, &saveddata, TASK_MAIN_PRIORITY, NULL );
+		if(!xres){
+			LCD_WriteString("Unable to start main app Task: ");
+			LCD_WriteInt(xres,10);
+		}
+
+	    vTaskStartScheduler();
+
+	    while(1){
+
+	    }
+}
+
+

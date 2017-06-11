@@ -23,5 +23,5 @@ enum RtcFormat{
 };
 
 void popConfig(void *ptr);
-int config(int b);
+int config(void);
 #endif

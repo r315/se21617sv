@@ -1,6 +1,8 @@
 #ifndef _space_h_
 #define _space_h_
 
+#include <lcd.h>
+
 #define SCREEN_W 240
 #define SCREEN_H 224
 
@@ -34,6 +36,8 @@
 #define PROJECTILE_H 6
 
 #define MAX_LIVES 1
+
+#define SPACE_UPDATE_RATE 30 //ms
 
 enum gStates{
     RUNNING,
@@ -73,8 +77,19 @@ typedef struct _gameData{
   //  Projectile alienprojectiles[MAX_PROJECTILES];
 }GameData;
 
-void popSpace(void *ptr);
-void space(int b);
-void newGame(GameData *gd);
+/*
+ * @brief Inicializa um jogo com os parametros passados no argumento do tipo GameData
+ */
+void SPACE_Init(void *ptr);
+
+/*
+ * @brief task que executa o jogo, um ponteiro para uma estrutura do tipo GameData deve ser fornecido.
+ */
+void Task_Space(void *ptr);
+
+/*
+ * @brief Inicializa uma estrutura com os valores por defeito.
+ */
+void SPACE_NewGame(GameData *gd);
 
 #endif

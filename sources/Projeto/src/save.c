@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <flash.h>
 #include <lcd.h>
-#include "proj.h"
+#include <Task_Common.h>
 
 
 #if defined(__LPCXpresso__)
