@@ -1,0 +1,18 @@
+OPTIMIZE_OUTPUT_FOR_C  = YES
+EXTRACT_ALL            = YES
+INPUT                  = "include/" \
+                         "sources/Projeto/inc" \
+                         "sources/Projeto/src" \
+                         "sources/Projeto/src/startup" \
+                         "sources/SE2_Lib/inc" \
+                         "sources/SE2_Lib/src" \
+                         "sources/SE2_Lib/bsp/LPCXpresso" \
+SOURCE_BROWSER         = YES
+GENERATE_LATEX         = NO
+ 
+CLASS_DIAGRAMS         = NO
+HAVE_DOT               = NO
+
+OUTPUT_DIRECTORY       = /home/hmr/Documents
+PROJECT_NAME           = "SE2 SV1617 Projeto: Space Invaders"
+

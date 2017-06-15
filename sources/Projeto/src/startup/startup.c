@@ -5,7 +5,7 @@
 #include <rtc.h>
 #include <button.h>
 #include <eth.h>
-#include <micro_ip.h>
+#include <Task_Net.h>
 #include <util.h>
 
 #if defined(__LPCXpresso__)
@@ -99,10 +99,6 @@ void SYS_Init(void){
 	LCD_WriteChar('\n');
 	LCD_WriteString("ETH: PHY ID 0x");
 	LCD_WriteInt(ETH_GetPHY_ID(),16);LCD_WriteChar('\n');
-
-	MICRO_IP_Init();
-
-	TIME_DelayMs(1000);
 }
 
 /**
@@ -131,6 +127,7 @@ portBASE_TYPE xres;
 			LCD_WriteString("Unable to start main app Task: ");
 			LCD_WriteInt(xres,10);
 		}
+
 
 	    vTaskStartScheduler();
 

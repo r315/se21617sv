@@ -109,25 +109,25 @@
 /* EMAC variables located in AHB SRAM bank 1 */
 #define EMAC_MEM_BASE 	0x2007C000						//RamAHB32
 
-typedef struct _Desc{
+typedef struct{
 	void *packet;
 	uint32_t control;
 }EMAC_Descriptor;
 
-typedef struct _RxStatus{
+typedef struct{
 	uint32_t info;
 	uint32_t crc;
 }EMAC_RxStatus;
 
-typedef struct _TxStatus{
+typedef struct{
 	uint32_t info;
 }EMAC_TxStatus;
 
-typedef struct _ETHBuf{
+typedef struct{
 	uint8_t data[ETH_FRAG_SIZE];
 }EMAC_Buffer;
 
-typedef struct EMACMem{
+typedef struct{
 	EMAC_Descriptor rxdesc[NUM_RX_FRAG];
 	EMAC_RxStatus  rxstatus[NUM_RX_FRAG];
 	EMAC_Descriptor txdesc[NUM_TX_FRAG];

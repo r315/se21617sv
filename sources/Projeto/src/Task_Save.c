@@ -16,11 +16,11 @@ static void LOG(char *msg){
 #endif
 
 portBASE_TYPE SAVE_QueuePut(void *data, uint32_t size){
-	//return EEPROM_Write(0, data, dataSize);
+
 portBASE_TYPE res;
 	svi.data = data;
 	svi.size = size;
-	res = xQueueSendToBack(save_queue, &svi, TASK_SAVE_MAX_TICKS);
+	res = xQueueSendToBack(save_queue, &svi, TASK_SAVE_WAIT_TICKS);
 	if(res == errQUEUE_FULL)
 		LOG("Save QUEUE Full\n");
 	return res;
@@ -33,12 +33,13 @@ portBASE_TYPE SAVE_QueueGet(void *data, uint32_t size){
 }
 
 void Task_Save(void *ptr){
-
+SAVE_Item itm;
 	save_queue = xQueueCreate(SAVE_QUEUE_MAX_ELEMENTS, sizeof(SAVE_Item));
 
 	while(1){
 		if(uxQueueMessagesWaiting(save_queue) != SAVE_QUEUE_MAX_ELEMENTS){
-
+			xQueueReceive(save_queue, &itm, TASK_SAVE_WAIT_TICKS);
+			EEPROM_Write(SAVE_BASE_ADDRESS, itm.data , itm.size);
 		}
 
 	}

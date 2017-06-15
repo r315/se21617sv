@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <i2c.h>
 
-typedef struct _eeprom{
+typedef struct{
 	LPC_I2C_TypeDef *i2cif;
 	uint8_t device;             // 8-bit slave addresss
 	uint8_t *data;              // data buffer for r/w

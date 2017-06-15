@@ -45,7 +45,7 @@ enum gStates{
     SELECT
 };
 
-typedef struct _sprite{
+typedef struct{
     int x;
     int y;
     uint8_t type;    
@@ -53,7 +53,7 @@ typedef struct _sprite{
 	uint8_t data;
 }Sprite;
 
-typedef struct projectile{
+typedef struct{
     int x;
     int y;
     uint16_t color;
@@ -61,7 +61,7 @@ typedef struct projectile{
 	int8_t velocity;
 }Projectile;
 
-typedef struct _gameData{
+typedef struct{
     uint32_t score;
     uint8_t state;
 	uint32_t topscore;

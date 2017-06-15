@@ -1,5 +1,9 @@
-#ifndef _config_h_
-#define _config_h_
+/**
+ * \addtogroup Tasks
+ * @{
+ */
+#ifndef __task_config_h__
+#define __task_config_h__
 
 #define CFG_FC GREEN
 #define CFG_BC BLACK
@@ -22,6 +26,9 @@ enum RtcFormat{
    RTC_WDAY  
 };
 
-void popConfig(void *ptr);
-int config(void);
+/**
+ * @brief Funcao chamada pela task, para execução da funcionalidade de configuração
+ */
+void Task_Config(void *ptr);
+
 #endif

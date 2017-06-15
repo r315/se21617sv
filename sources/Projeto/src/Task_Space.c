@@ -1,11 +1,11 @@
 #include <string.h>
 #include <lcd.h>
 #include <stdint.h>
-#include "space.h"
 #include "../sprites/sprites.h"
 #include <misc.h>
 //#include <spi.h>
 #include <Task_Common.h>
+#include <Task_Space.h>
 
 #include <util.h>
 
@@ -248,12 +248,25 @@ void updatePlayerName(char *name) {
 	LCD_WriteString(gamedata->playername);
 }
 
+void highlightChar(char *str, uint8_t idx, uint16_t fc, uint16_t bc, uint16_t hfc, uint16_t hbc){
+uint8_t i = 0;
+	LCD_Goto(SCREEN_SX + 30 + 12 * 8, SCREEN_SY + 50);
+	while(*str){
+		if(i == idx)
+			LCD_SetColors(hfc,hbc);
+		else
+			LCD_SetColors(fc,bc);
+		LCD_WriteChar(*str++);
+		i++;
+	}
+}
+
 void selectPlayerName(char *pname, uint8_t curchar, int8_t inc) {
 	uint8_t ch = *(pname + curchar);
 	ch += inc;
 	if (ch >= 'A' && ch <= 'Z') {
 		*(pname + curchar) = ch;
-		updatePlayerName(pname);
+		highlightChar(pname, curchar,SPACE_FONT_COLOR,BLACK,WHITE, BLACK);
 	}
 }
 
@@ -268,7 +281,8 @@ void showScoreTable(void) {
 	}
 	LCD_WriteString("Enter Name: ");
 	LCD_SetColors(SPACE_FONT_COLOR, BLACK);
-	updatePlayerName(gamedata->playername);
+	//updatePlayerName(gamedata->playername);
+	selectPlayerName(gamedata->playername, 0 , 0);
 	/*LCD_WriteString("Full Score:
 	 Big
 	 little
@@ -348,7 +362,10 @@ void Task_Space(void *ptr) {
 				if ((++alienframe) == 3) {
 					SPACE_NewGame(gamedata);
 					clearGame();
+					BUTTON_QueueClear();
+					moveTank(&gamedata->tank, 0);
 				}
+				selectPlayerName(gamedata->playername, alienframe, 0);
 				break;
 			default:
 				break;

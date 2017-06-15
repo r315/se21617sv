@@ -1,10 +1,8 @@
+//#include <clock-arch.h>
 
+#include <timer.h>
 #include <util.h>
-#include "timer.h"
 
-/*
- * @brief
- */
 int clock_time(void){
 	return  TIME_GetValue();
 }

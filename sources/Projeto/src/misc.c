@@ -2,6 +2,7 @@
 #include <led.h>
 #include <lcd.h>
 #include <misc.h>
+#include <util.h>
 
 /**
   * @brief Contagem de frames por segundo
@@ -10,7 +11,7 @@ void MISC_countFps(void) {
 	static int secondsCount = 0;
 	static uint8_t fps = 0;
 	if (TIME_GetValue() > secondsCount) {
-		LCD_Goto(0, 0);
+		LCD_Goto(0, LCD_H - LCD_GetFontHeight());
 		LCD_WriteInt(fps, 10);
 		LCD_WriteString("FPS  ");
 		secondsCount = TIME_GetValue() + 1000;
@@ -70,4 +71,9 @@ uint32_t time;
     LED_SetState(LED_OFF);
     LCD_Goto(0,0);
     LCD_WriteInt(time,10);
+}
+
+
+uint16_t rand(void){
+	return ((TIME_GetValue() ^ 0x1244654) >> (TIME_GetValue() ^ 0xa)) %0xFFFF ;
 }

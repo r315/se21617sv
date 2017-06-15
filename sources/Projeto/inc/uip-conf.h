@@ -151,7 +151,7 @@ typedef unsigned short uip_stats_t;
 /*#include "dhcp_server.h" */
 #include "resolv.h"
 #include "webclient.h"
-#include "micro_ip.h"
+#include <Task_Net.h>
 
 
 #endif /* __UIP_CONF_H__ */

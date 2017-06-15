@@ -1,4 +1,10 @@
+/**
+ * \addtogroup uipopt
+ * @{
+ */
+
 /*
+
  * Copyright (c) 2001, Adam Dunkels.
  * All rights reserved. 
  *
@@ -40,8 +46,20 @@
 
 #include "eth.h"
 
+/**
+ * @brief função para inicialização da interface de rede
+ */
 void tapdev_init(void);
+
+/**
+ * @brief leitura de trama
+ * @return 0 ou tamanho da trama recebida
+ */
 unsigned int tapdev_read(void);
+
+/**
+ * @brief processa uma trama para ser enviada
+ */
 void tapdev_send(void);
 
 #endif /* __TAPDEV_H__ */

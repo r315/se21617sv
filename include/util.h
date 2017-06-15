@@ -1,3 +1,11 @@
+/**
+* @file		util.h
+* @brief	Contains util functions
+*     		
+* @version	1.0
+* @date		5 Nov. 2016
+* @author	Hugo Reis
+**********************************************************************/
 #ifndef _util_h_
 #define _util_h_
 
@@ -20,5 +28,4 @@
 #define TIMER0_TicksToMs(x) x
 #endif
 
-uint16_t rand(void);
 #endif /* _util_h_ */

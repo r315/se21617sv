@@ -1,14 +1,19 @@
-#ifndef _proj_h_
-#define _proj_h_
+/**
+ * \addtogroup Tasks
+ * @{
+ */
+#ifndef _task_common_h_
+#define _task_common_h_
 
 #include <time.h>
-#include "space.h"
-
 #include <FreeRTOS.h>
 #include <task.h>
 
 #include <Task_Button.h>
 #include <Task_Save.h>
+#include <Task_Net.h>
+#include <Task_Space.h>
+#include <Task_Config.h>
 
 #define ON 1
 #define OFF 0
@@ -24,7 +29,7 @@ typedef enum Mstates{
   SAVE    
 }State;
 
-typedef struct _SaveData{
+typedef struct{
     uint32_t topscores[MAX_TOP_SCORES];    
     uint8_t checksum;
     GameData spaceInvaders;
@@ -64,15 +69,10 @@ extern xTaskHandle *taskMainHandle;
 		vTaskResume(taskMainHandle);	/* Retoma a Task Main */      \
 		vTaskDelete(NULL);				/* Termina a Task corrente */ \
 
-
 /**
- * @brief Nome das funcoes atribuidas a tasks
+ * @brief Funcao chamada pela task que executa após o startup
  */
 void Task_Main(void *ptr);
-void Task_Config(void *ptr);
-void Task_Button(void *ptr);
-void Task_Net(void *ptr);
-void Task_Save(void *ptr);
 
 
 /*

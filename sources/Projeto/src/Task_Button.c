@@ -1,3 +1,4 @@
+
 #include <Task_Common.h>
 #include <queue.h>
 #include <stdio.h>
@@ -9,8 +10,17 @@ xQueueHandle *btn_queue;
 static void LOG(char *msg){
 	printf("Task Button: %s", msg);
 }
+#else
+#define LOG(x)
 #endif
 
+BTN_Event BUTTON_QueueClear(void){
+BTN_Event button;
+	while(xQueueReceive(btn_queue, &button, 0) == pdPASS);
+	button.value = BUTTON_EMPTY;
+	button.event = BUTTON_EMPTY;
+	return button;
+}
 
 BTN_Event BUTTON_QueueGet(void){
 BTN_Event button;

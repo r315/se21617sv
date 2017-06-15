@@ -12,19 +12,16 @@
 #include "LPC17xx.h"
 #endif
 
+#include <stdio.h>
 #include <string.h>
 #include <lcd.h>
 #include <led.h>
 #include <rtc.h>
 #include <util.h>
-#include "system.h"
-#include "save.h"
-#include "config.h"
-#include "space.h"
-#include "idle.h"
 #include <misc.h>
+#include <Task_Config.h>
+#include <Task_Space.h>
 #include <Task_Common.h>
-#include <stdio.h>
 
 xTaskHandle *taskMainHandle;
 
@@ -32,6 +29,8 @@ xTaskHandle *taskMainHandle;
 static void LOG(char *msg){
 	printf("Task Main: %s", msg);
 }
+#else
+#define LOG(x)
 #endif
 
 static const char title[]={
@@ -109,6 +108,8 @@ saveddata = (SaveData *)ptr;
 restoreData(saveddata,sizeof(SaveData));
 
 LCD_SetColors(GREEN,BLACK);
+
+vTaskDelay(1000);
 
 taskMainHandle = xTaskGetCurrentTaskHandle(); // Salvaguarda o handle da task main para poder ser retomada
 

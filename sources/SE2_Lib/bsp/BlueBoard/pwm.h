@@ -1,3 +1,12 @@
+/**
+* @file		pwm.h
+* @brief	Contains PWM signal generation API header.
+*
+* @version	1.0
+* @date		20 Apr. 2017
+* @author	Hugo Reis
+**********************************************************************/
+
 #ifndef _pwm_h_
 #define _pwm_h_
 

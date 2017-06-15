@@ -40,11 +40,11 @@ enum Bevent{
 #include <LPC17xx.h>
 /**
 * @brief Button connections
-*		P0.26  Left
-*		P0.3   Right
-*		P0.2   Fire
-*       P0.21  Up
-*       P0.27  Down
+*		P0.26  Center
+*		P0.3   Up
+*		P0.2   Right
+*       P0.21  Left
+*       P0.1   Down
 **/
 #define BUTTON_F (1<<26)
 #define BUTTON_S (1<<3)

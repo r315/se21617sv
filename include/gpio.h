@@ -12,10 +12,8 @@
 
 #include <stdint.h>
 
-#if defined(__USE_CMSIS)
-	#include <LPC17xx.h>
 
-
+#if defined(__ARM_ARCH_7M__)
 #define P0_0
 
 #define ON 1
@@ -23,6 +21,10 @@
 #define GPIO_OUTPUT 1
 #define GPIO_HIGH   1
 #define GPIO_LOW    0
+
+
+#if defined(__USE_CMSIS)
+#include <LPC17xx.h>
 
 /**
 * @brief Initialyze pin and set his state
@@ -49,17 +51,13 @@ void GPIO_SetState(uint32_t pin, uint8_t state);
 **/
 #define GPIO_SetOutput(pin) LPC_GPIO0->FIODIR |= (1<<pin)
 
+/**
+* @brief Set pin of GPIO0 as input
+**/
+#define GPIO_SetInput(pin) LPC_GPIO0->FIODIR &= ~(1<<pin)
 
-#elif defined(__LPCXpresso__)
+#else
 #include <lpc1768.h>
-
-#define P0_0
-
-#define ON 1
-#define OFF 0
-#define GPIO_OUTPUT 1
-#define GPIO_HIGH   1
-#define GPIO_LOW    0
 
 /**
 * @brief Initialyze pin and set his state
@@ -86,6 +84,11 @@ void GPIO_SetState(uint32_t pin, uint8_t state);
 **/
 #define GPIO_SetOutput(pin) GPIO0->FIODIR |= (1<<pin)
 
+/**
+* @brief Set pin of GPIO0 as input
+**/
+#define GPIO_SetInput(pin) GPIO0->FIODIR &= ~(1<<pin)
+#endif  /* __USE_CMSIS  */
 
 #elif defined(__LPC2106__)
 #include <lpc2106.h>
@@ -120,6 +123,7 @@ void GPIO_SetState(uint32_t pin, uint8_t state);
 #define GPIO_SetOutputN(n) FIO0->DIR |= n       //affect multiple pin
 #define GPIO_SetInputN(n)  FIO0->DIR &= ~n      //affect multiple pin
 
-#endif
+#endif /* __ARM_ARCH_7M__ */
 
 #endif
+

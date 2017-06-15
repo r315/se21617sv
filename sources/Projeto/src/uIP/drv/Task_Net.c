@@ -6,8 +6,8 @@
 #include "uip-conf.h"
 #include "uip.h"
 #include "uiplib.h"
-#include "micro_ip.h"
 #include "uip_arp.h"
+#include <Task_Common.h>
 
 
 #define BUF ((struct uip_eth_hdr *)&uip_buf[0])
@@ -22,7 +22,7 @@ void MICRO_IP_PrintIp(uip_ipaddr_t ip){
 	LCD_WriteInt((uint8_t)HTONS(ip[1]), 10); LCD_WriteChar('\n');
 }
 
-void MICRO_IP_Init(void){
+void Task_Net_Init(void){
 uip_ipaddr_t ipaddr;
 
 	uip_log("Starting");
@@ -53,8 +53,11 @@ uip_ipaddr_t ipaddr;
 	 resolv_query("retro.hackaday.com");
 }
 
-void MICRO_IP_Task(void){
+void Task_Net(void *ptr){
 int i;
+
+	Task_Net_Init();
+
 	while (1) {
 		uip_len = tapdev_read();
 		if (uip_len > 0) {

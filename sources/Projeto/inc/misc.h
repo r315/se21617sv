@@ -24,7 +24,7 @@ uint32_t strlenInPixels(char *str);
 void mesureDisplayDraw(void);
 
 /**
- * @ Gera um numero pseudo aleatorio
+ * @ Gera um numero pseudo aleatorio, usando o timer
  */
 uint16_t rand(void);
 

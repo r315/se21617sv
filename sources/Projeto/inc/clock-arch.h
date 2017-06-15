@@ -30,11 +30,22 @@
  *
  * $Id: clock-arch.h,v 1.2 2006/06/12 08:00:31 adam Exp $
  */
-
+/**
+ * \addtogroup uipopt
+ * @{
+ */
 #ifndef __CLOCK_ARCH_H__
 #define __CLOCK_ARCH_H__
 
 typedef int clock_time_t;
+
 #define CLOCK_CONF_SECOND 1000
+
+
+/**
+ * @brief O valor em milisegundos que decorreram desque que o sistema foi ligado..
+ */
+int clock_time(void);
+
 
 #endif /* __CLOCK_ARCH_H__ */

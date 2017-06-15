@@ -3,7 +3,7 @@
 #include <rtc.h>
 #include <misc.h>
 #include <Task_Common.h>
-#include "config.h"
+#include <Task_Config.h>
 
 //TODO: fix field indicator and save to flash
 

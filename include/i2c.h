@@ -23,7 +23,7 @@
 
 #define I2C_DEFAULT_CLOCK 100000 //Standard 100Khz
 
-enum _i2cStates{
+enum I2C_States{
 	I2C_IDLE = 0,
 	REPEATED_START,    //0x01
 	SLA_READ,          //0x02
@@ -38,7 +38,7 @@ enum _i2cStates{
 	ERROR_DTA_R_NACK   //0x0B
 };
 
-typedef struct _i2cControl{
+typedef struct{
 	LPC_I2C_TypeDef *interface; // i2c interface to be used
 	uint8_t device;             // 8-bit slave address
 	uint8_t *data;              // data buffer for r/w
