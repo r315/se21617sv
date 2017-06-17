@@ -39,6 +39,8 @@
 
 #define SPACE_UPDATE_RATE 30 //ms
 
+#define MAX_TOP_SCORES 3
+
 enum gStates{
     RUNNING,
     ENDED,
@@ -64,7 +66,7 @@ typedef struct{
 typedef struct{
     uint32_t score;
     uint8_t state;
-	uint32_t topscore;
+    uint32_t topscores[MAX_TOP_SCORES];
 	uint8_t lives;
     uint8_t alienscount;
     uint8_t end;

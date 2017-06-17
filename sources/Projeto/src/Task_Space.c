@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include "../sprites/sprites.h"
 #include <misc.h>
-//#include <spi.h>
 #include <Task_Common.h>
 #include <Task_Space.h>
 
@@ -33,7 +32,7 @@ void drawSprite(Sprite *sp) {
 }
 
 /**
- * @brief clears game area for new games
+ * @brief clears game area for new games, note does not clear scores
  */
 void clearGame(void) {
 	LCD_FillRect(SCREEN_SX, SCREEN_SY + SCREEN_TOP, SCREEN_W,
@@ -240,8 +239,31 @@ void updateLives(uint8_t lives) {
 	LCD_WriteInt(lives, 10);
 }
 
+void updateTopScore(uint32_t top){
+#if (SCREEN_W > 200)
+	LCD_Goto(SCREEN_SX + 110, SCREEN_SY + 3);
+	LCD_WriteString("HI-SCORE:");
+	LCD_WriteInt(top, SCORES_FORMAT);
+#endif
+}
 
-
+void saveTopScore(uint32_t score, uint32_t *scorestab){
+uint8_t n;
+uint32_t *p1,*p2;
+   for(n = 0; n < MAX_TOP_SCORES; n++){
+       if(score > scorestab[n]){				// if score enters the table
+           p1 = &scorestab[MAX_TOP_SCORES-2];   // the scores below must shift down
+           p2 = &scorestab[MAX_TOP_SCORES-1];
+           while( (p2) != &scorestab[n]){		// shift start from table bottom
+               *p2 = *p1;
+               p1 -= 1;
+               p2 -= 1;
+           }
+           scorestab[n] = score;
+           return;
+       }
+   }
+}
 
 void updatePlayerName(char *name) {
 	LCD_Goto(SCREEN_SX + 30 + 12 * 8, SCREEN_SY + 50);
@@ -271,6 +293,7 @@ void selectPlayerName(char *pname, uint8_t curchar, int8_t inc) {
 }
 
 void showScoreTable(void) {
+	saveTopScore(gamedata->score, gamedata->topscores);
 	LCD_SetColors(GREEN, BLACK);
 	LCD_Goto(SCREEN_SX + 30, SCREEN_SY + 50);
 	if(gamedata->playername[0] == '\0'){
@@ -289,7 +312,6 @@ void showScoreTable(void) {
 	 ");*/
 }
 
-
 void SPACE_Init(void *ptr) {
 
 	gamedata = (GameData*) ptr;
@@ -307,12 +329,6 @@ void SPACE_Init(void *ptr) {
 	LCD_Goto(SCREEN_SX + LCD_GetFontWidth(), SCREEN_SY + 3);
 	LCD_WriteString("SCORE:");
 
-#if (SCREEN_W > 200)
-	LCD_Goto(SCREEN_SX + 110, SCREEN_SY + 3);
-	LCD_WriteString("HI-SCORE:");
-	LCD_WriteInt(gamedata->topscore, SCORES_FORMAT);
-#endif
-
 	LCD_Goto(SCREEN_SX + 3, SCREEN_SY + SCREEN_H - LCD_GetFontHeight());
 	LCD_WriteString("Lives:");
 
@@ -321,6 +337,7 @@ void SPACE_Init(void *ptr) {
 
 	BUTTON_SetHoldTime(80);
 
+	updateTopScore(gamedata->topscores[0]);
 	moveTank(&gamedata->tank, 0);
 	moveAliens(gamedata->aliens, Aliens1, 0);
 	updateScore(gamedata->score);
@@ -360,10 +377,13 @@ void Task_Space(void *ptr) {
 				break;
 			case BUTTON_C:
 				if ((++alienframe) == 3) {
-					SPACE_NewGame(gamedata);
+					NET_SendScore(gamedata->score, gamedata->playername);			// send stats to server
 					clearGame();
-					BUTTON_QueueClear();
+					SPACE_NewGame(gamedata);  //game state is changed here
+					updateTopScore(gamedata->topscores[0]);
 					moveTank(&gamedata->tank, 0);
+					BUTTON_QueueClear();
+					break;
 				}
 				selectPlayerName(gamedata->playername, alienframe, 0);
 				break;
@@ -373,6 +393,7 @@ void Task_Space(void *ptr) {
 		}
 	} else {
 		if (TIMER0_GetValue() > frametime) {
+			if (button.event == BUTTON_PRESSED || button.event == BUTTON_HOLD) {
 			switch (button.value) {
 
 			case BUTTON_L:
@@ -410,7 +431,7 @@ void Task_Space(void *ptr) {
 			default:
 				break;
 			}
-
+			}
 			//movimentação dos aliens
 			if (!(--speed)) {
 				dir = moveAliens(gamedata->aliens,
@@ -432,8 +453,7 @@ void Task_Space(void *ptr) {
 			// move os projeteis do jogador e verifica se colidiu com algum alien
 			for (n = 0; n < TANK_MAX_PROJECTILES; n++) {
 				moveProjectile(&gamedata->tankprojectiles[n]);
-				alienpoints = checkPlayerHit(&gamedata->tankprojectiles[n],
-						gamedata->aliens);
+				alienpoints = checkPlayerHit(&gamedata->tankprojectiles[n],	gamedata->aliens);
 				gamedata->score += alienpoints;
 				if (alienpoints) {
 					gamedata->alienscount--;
