@@ -12,6 +12,7 @@
 #endif
 
 #define TASK_BUTTON_MAX_TICKS 100
+#define BTN_QUEUE_MAX_ELEMENTS 	10
 
 typedef struct{
 	uint32_t value;
