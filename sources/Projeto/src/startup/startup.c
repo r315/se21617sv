@@ -22,11 +22,19 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <Task_Common.h>
-#include <Task_Button.h>
 
 const int defaultRtc[]={0,0,0,0,0,2010,0,0,0,0,0};
 
 SaveData saveddata;
+
+#if TASK_STARTUP_DEBUG
+static void LOG(char *msg){
+	printf("Startup: %s", msg);
+}
+#else
+#define LOG(x)
+#endif
+
 
  /**
   * @brief peripheral initialization
@@ -105,29 +113,25 @@ void SYS_Init(void){
  * @brief Main Function, initialize all hardware and start tasks
  **/
 int main(void){
-portBASE_TYPE xres;
 	 SYS_Init();
 
 	    LCD_WriteString("Starting RTOS Tasks\n");
 
-	    xres = xTaskCreate(Task_Button, "Button", TASK_BUTTON_HEAP , NULL, TASK_BUTTON_PRIORITY, NULL );
-		if(!xres){
-			LCD_WriteString("Unable to start Button Task: ");
-			LCD_WriteInt(xres,10);
+	    if(xTaskCreate(Task_Save, "Save", TASK_SAVE_HEAP, NULL , TASK_SAVE_PRIORITY, NULL ) != pdPASS){
+			LOG("Unable to start SaveSend Task\n");
 		}
 
-	    xres = xTaskCreate(Task_Net, "Network", TASK_NET_HEAP, NULL, TASK_NET_PRIORITY, NULL );
-	    if(!xres){
-	    	LCD_WriteString("Unable to start Micro ip Task: ");
-	    	LCD_WriteInt(xres,10);
+	    if(xTaskCreate(Task_Button, "Button", TASK_BUTTON_HEAP , NULL, TASK_BUTTON_PRIORITY, NULL )  != pdPASS){
+			LOG("Unable to start Button Task\n");
+		}
+
+	    if(xTaskCreate(Task_Net, "Network", TASK_NET_HEAP, NULL, TASK_NET_PRIORITY, NULL )  != pdPASS){
+	    	LOG("Unable to start Micro ip Task\n");
 	    }
 
-	    xres = xTaskCreate(Task_Main, "Main", TASK_MAIN_HEAP, &saveddata, TASK_MAIN_PRIORITY, NULL );
-		if(!xres){
-			LCD_WriteString("Unable to start main app Task: ");
-			LCD_WriteInt(xres,10);
+	   if(xTaskCreate(Task_Main, "Main", TASK_MAIN_HEAP, &saveddata, TASK_MAIN_PRIORITY, NULL )   != pdPASS){
+		    LOG("Unable to start main app Task\n");
 		}
-
 
 	    vTaskStartScheduler();
 
