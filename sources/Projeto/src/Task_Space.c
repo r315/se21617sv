@@ -1,7 +1,7 @@
 #include <string.h>
 #include <lcd.h>
 #include <stdint.h>
-#include "../sprites/sprites.h"
+#include "sprites.h"
 #include <misc.h>
 #include <Task_Common.h>
 #include <Task_Space.h>
@@ -304,12 +304,7 @@ void showScoreTable(void) {
 	}
 	LCD_WriteString("Enter Name: ");
 	LCD_SetColors(SPACE_FONT_COLOR, BLACK);
-	//updatePlayerName(gamedata->playername);
 	selectPlayerName(gamedata->playername, 0 , 0);
-	/*LCD_WriteString("Full Score:
-	 Big
-	 little
-	 ");*/
 }
 
 void SPACE_Init(void *ptr) {

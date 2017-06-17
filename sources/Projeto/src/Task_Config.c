@@ -5,8 +5,6 @@
 #include <Task_Common.h>
 #include <Task_Config.h>
 
-//TODO: fix field indicator and save to flash
-
 
 static struct tm alarm, *cur_time;
 static uint8_t field;

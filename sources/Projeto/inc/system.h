@@ -2,7 +2,7 @@
 #define _system_h_
 
 /**
- * @brief inicaliza todo o hardware do sistema
+ * @brief inicaliza hardware do sistema
  */
 void SYS_Init(void);
 #endif
