@@ -23,7 +23,7 @@
 #include <Task_Space.h>
 #include <Task_Common.h>
 
-xTaskHandle *taskMainHandle;
+xTaskHandle *resumeTaskHandle;
 
 #if TASK_MAIN_DEBUG
 static void LOG(char *msg){
@@ -35,9 +35,9 @@ static void LOG(char *msg){
 
 static const char title[]={
     "           MAIN\n\n"
-    "F   -  start new Game\n"
-    "S   -  Load Game\n"
-    "D   -  for config(2s)\n\n"
+    "C   -  start new Game\n"
+    "U   -  Load Game\n"
+    "L   -  for config(2s)\n\n"
     "Top Scores:\n"
 };
 
@@ -76,7 +76,7 @@ void MAIN_Init(void *ptr){
     LCD_WriteString((char*)title);
 
     LCD_SetColors(YELLOW,BLACK);
-    MAIN_HighScores(96,112,(uint32_t *)ptr);
+    MAIN_HighScores(96, 112, ((SaveData *)ptr)->spaceInvaders.topscores);
     LCD_SetColors(GREEN,BLACK);
     BUTTON_SetHoldTime(ENTER_CONFIG_TIME);
 }
@@ -93,31 +93,35 @@ void MAIN_Update(void){
     }
 }
 
+void MAIN_Game(SaveData *ptr){
+	resumeTaskHandle = xTaskGetCurrentTaskHandle(); // Salvaguarda o handle da task corrente para poder ser retomada
+	if(!xTaskCreate(Task_Space, "Space", TASK_SPACE_HEAP, &ptr->spaceInvaders, TASK_SPACE_PRIORITY, NULL )){
+		LOG("unable to start task Space\n");
+	}
+	vTaskSuspend(NULL);		// suspende a task Main
+	ptr->checksum = generateChecksum(&ptr->spaceInvaders, sizeof(GameData));
+	SAVE_QueuePut(ptr, sizeof(SaveData));
+}
 
 
 /**
  * @brief Task criada apos startup
  */
 void Task_Main(void *ptr){
-uint8_t taskFinished = ON;
-//uint32_t res;
+uint8_t refreshMain = ON;
 BTN_Event button;
 SaveData *saveddata;
 saveddata = (SaveData *)ptr;
 
-restoreData(saveddata,sizeof(SaveData));
+SAVE_QueueGet(saveddata, sizeof(SaveData));
 
 LCD_SetColors(GREEN,BLACK);
 
-vTaskDelay(1000);
-
-taskMainHandle = xTaskGetCurrentTaskHandle(); // Salvaguarda o handle da task main para poder ser retomada
-
 while(1){
 
-	if(taskFinished == ON){
-		MAIN_Init(saveddata->topscores);
-		taskFinished = OFF;
+	if(refreshMain == ON){
+		MAIN_Init(ptr);
+		refreshMain = OFF;
 	}
 
 	button = BUTTON_QueueGet();
@@ -126,22 +130,28 @@ while(1){
 	if(button.event != BUTTON_EMPTY){
 		if(button.event == BUTTON_PRESSED){
 			switch(button.value){
+
 			case BUTTON_C:
-				//newGame(&saveddata.spaceInvaders);
+				SPACE_NewGame(&saveddata->spaceInvaders);
+				MAIN_Game(saveddata);
+				refreshMain = ON;
 				break;
+
 			case BUTTON_U:
-				restoreData(saveddata, sizeof(SaveData));
+				SAVE_QueueGet(saveddata, sizeof(SaveData));
 				if(!checksumData((void*)&(saveddata->spaceInvaders), sizeof(GameData), saveddata->checksum)){
-					if(!xTaskCreate(Task_Space, "Space", TASK_SPACE_HEAP, &saveddata->spaceInvaders, TASK_SPACE_PRIORITY, NULL )){
-						LOG("unable to start task Space\n");
-					}
-					vTaskSuspend(NULL);		// suspende a task Main
-					taskFinished = ON;
+					MAIN_Game(saveddata);
+					refreshMain = ON;
+				}
+				else{
+					LOG("Bad Checksum of GameData\n");
 				}
 				break;
+
 			case BUTTON_R:
 				//mesureDisplayDraw();
 				break;
+
 			default: break;
 			}
 
@@ -152,14 +162,16 @@ while(1){
 						LOG("unable to start task config\n");
 					}
 					vTaskSuspend(NULL);		// suspende a task corrente
-					taskFinished = ON;
+					refreshMain = ON;
 					break;
 
 				case BUTTON_R:  //Erase Top Scores
 					memset(saveddata, 0, sizeof(SaveData));
-					saveData(saveddata, sizeof(SaveData));
+					SAVE_QueuePut(saveddata, sizeof(SaveData));
 					//switchTo(IDLE);
 					//BUTTON_WaitEvent(BUTTON_RELEASED);
+					BUTTON_QueueClear();
+					refreshMain = ON;
 				default: break;
 			}
 		}
