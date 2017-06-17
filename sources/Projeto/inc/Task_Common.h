@@ -8,6 +8,7 @@
 #include <time.h>
 #include <FreeRTOS.h>
 #include <task.h>
+#include <semphr.h>
 
 #include <Task_Button.h>
 #include <Task_Save.h>
@@ -18,7 +19,6 @@
 #define ON 1
 #define OFF 0
 
-#define MAX_TOP_SCORES 3
 #define SCORES_FORMAT (4<<8) | 10
 #define ENTER_CONFIG_TIME 2000 //2 seconds
 
@@ -30,7 +30,6 @@ typedef enum Mstates{
 }State;
 
 typedef struct{
-    uint32_t topscores[MAX_TOP_SCORES];    
     uint8_t checksum;
     GameData spaceInvaders;
     struct tm rtc;
@@ -39,10 +38,9 @@ typedef struct{
 
 #define TASK_BUTTON_HEAP 		128		//128 * 4 bytes
 #define TASK_BUTTON_PRIORITY	5		// range 1:30
-#define BTN_QUEUE_MAX_ELEMENTS 	10
 
-#define TASK_MAIN_HEAP			128
-#define TASK_MAIN_PRIORITY		10
+#define TASK_MAIN_HEAP			256
+#define TASK_MAIN_PRIORITY		20
 
 #define TASK_CONFIG_HEAP		128
 #define TASK_CONFIG_PRIORITY	10
@@ -51,10 +49,10 @@ typedef struct{
 #define TASK_SPACE_PRIORITY		20
 
 #define TASK_NET_HEAP			128
-#define TASK_NET_PRIORITY		10
+#define TASK_NET_PRIORITY		7
 
-#define TASK_SAVE_HEAP			32
-#define TASK_SAVE_PRIORITY		1
+#define TASK_SAVE_HEAP			128
+#define TASK_SAVE_PRIORITY		5
 
 
 #ifdef DEBUG
@@ -62,11 +60,12 @@ typedef struct{
 #define TASK_MAIN_DEBUG ON
 #define TASK_SPACE_DEBUG ON
 #define TASK_SAVE_DEBUG ON
+#define TASK_STARTUP_DEBUG ON
 #endif
 
-extern xTaskHandle *taskMainHandle;
+extern xTaskHandle *resumeTaskHandle;
 #define TASK_EXIT                                                     \
-		vTaskResume(taskMainHandle);	/* Retoma a Task Main */      \
+		vTaskResume(resumeTaskHandle);	/* Retoma a Task Main */      \
 		vTaskDelete(NULL);				/* Termina a Task corrente */ \
 
 /**

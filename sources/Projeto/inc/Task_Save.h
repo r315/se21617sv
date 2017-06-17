@@ -10,27 +10,34 @@
 typedef struct{
 	void *data;
 	uint32_t size;
+	uint8_t operation;
 }SAVE_Item;
 
 
 #define SAVE_BASE_ADDRESS 0
 #define TASK_SAVE_WAIT_TICKS 1000
-#define SAVE_QUEUE_MAX_ELEMENTS 10
+#define SAVE_QUEUE_MAX_ELEMENTS 2
+
+enum SAVE_OPER{
+	SAVE_READ,
+	SAVE_WRITE
+};
 
 
 
 /**
  * @brief coloca dados na fila para serem escritos
  */
-portBASE_TYPE SAVE_QueuePut(void *data, uint32_t size);
+void SAVE_QueuePut(void* data, uint32_t size);
 
 /**
  * @brief obtem dados da fila
  */
-portBASE_TYPE SAVE_QueueGet(void *data, uint32_t size);
+void SAVE_QueueGet(void *data, uint32_t size);
 
 /**
- * @brief Funcao chamada pela task que efectua as leituras e escrita na memoria eeprom
+ * @brief Funcao chamada pela task
+ *
  */
 void Task_Save(void *ptr);
 
