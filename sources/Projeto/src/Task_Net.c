@@ -47,10 +47,8 @@ uip_ipaddr_t ipaddr;
 	 MICRO_IP_PrintIp(uip_hostaddr);
 
 	 uiplib_ipaddrconv(MICRO_IP_DNS_ADDR, (uint8_t *)ipaddr);
-	 resolv_conf(ipaddr);										//Set DNS Server Address
-	 //resolv_query("www.google.com");
-	 //resolv_query("http://adeetc.thothapp.com");
-	 resolv_query("retro.hackaday.com");
+	 resolv_conf(ipaddr);										// Set DNS Server Address
+	 resolv_query(RESOLVE_ADDR);								// resolve address
 }
 
 void Task_Net(void *ptr){
@@ -121,11 +119,19 @@ void WEB_log(char *m) {
 void resolv_found(char *name, u16_t *ipaddr) {
 
 	if (ipaddr == NULL) {
+		#if MICRO_IP_DEBUG
 		printf("Host '%s' not found.\n", name);
+		#else
+		uip_log("");
+		#endif
 	} else {
+		#if MICRO_IP_DEBUG
 		printf("Found name '%s' = %d.%d.%d.%d\n", name, htons(ipaddr[0]) >> 8,
 				htons(ipaddr[0]) & 0xff, htons(ipaddr[1]) >> 8,
 				htons(ipaddr[1]) & 0xff);
+		#else
+		uip_log("");
+		#endif
 		//webclient_get("http://adeetc.thothapp.com", 80, "/api/v1/classes/634");
 		webclient_get("retro.hackaday.com",80,"/");
 	}
@@ -145,6 +151,11 @@ void webclient_connected(void) {
 	WEB_log("Webclient: connected, waiting for data...\n");
 }
 void webclient_datahandler(char *data, u16_t len) {
+#if WEB_DEBUG
 	printf("Webclient: got %d bytes of data.\n %s", len,data);
+#endif
+}
 
+void NET_SendScore(uint32_t score, char pname){
+	//TODO: Get server IP and implement post method
 }
