@@ -75,7 +75,7 @@ void Config_Init(void *ptr){
     LCD_WriteString((char*)title);
     LCD_SetColors(GREEN,BLACK);
     PRINT_FullDate(cur_time, field);
-    BUTTON_SetHoldTime(500);
+    BUTTON_SetHoldTime(200);
 }
 
 void Task_Config(void *ptr){

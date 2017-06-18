@@ -77,3 +77,11 @@ uint32_t time;
 uint16_t rand(void){
 	return ((TIME_GetValue() ^ 0x1244654) >> (TIME_GetValue() ^ 0xa)) %0xFFFF ;
 }
+
+void MISC_PrintIp(uint32_t *ip){
+	LCD_WriteString("IP: ");
+	LCD_WriteInt((uint8_t)(*ip>>0), 10); LCD_WriteChar('.');
+	LCD_WriteInt((uint8_t)(*ip>>8), 10); LCD_WriteChar('.');
+	LCD_WriteInt((uint8_t)(*ip>>16), 10); LCD_WriteChar('.');
+	LCD_WriteInt((uint8_t)(*ip>>24), 10); LCD_WriteChar('\n');
+}

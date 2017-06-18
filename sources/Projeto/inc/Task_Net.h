@@ -25,6 +25,6 @@ void Task_Net(void *ptr);
 /**
  * @brief envia score e nome para o servidor
  **/
-void NET_SendScore(uint32_t score, char pname);
+void NET_SendScore(uint32_t score, char *pname);
 
 #endif

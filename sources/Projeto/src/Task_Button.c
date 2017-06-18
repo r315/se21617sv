@@ -47,7 +47,7 @@ void Task_Button(void *ptr){
 			button.event = BUTTON_GetEvents();
 			if(xQueueSendToBack(btn_queue,&button, TASK_BUTTON_MAX_TICKS) == errQUEUE_FULL)
 				LOG("Button QUEUE Full\n");
-			taskYIELD();  //botão lido cede cpu para outra task
 		}
+		taskYIELD();  //botão lido cede cpu para outra task
 	}
 }

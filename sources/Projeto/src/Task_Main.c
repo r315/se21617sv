@@ -117,6 +117,8 @@ SAVE_QueueGet(saveddata, sizeof(SaveData));
 
 LCD_SetColors(GREEN,BLACK);
 
+vTaskDelay(1500);
+
 while(1){
 
 	if(refreshMain == ON){

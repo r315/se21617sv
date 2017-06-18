@@ -14,14 +14,6 @@
 static struct timer periodic_timer, arp_timer;
 
 
-void MICRO_IP_PrintIp(uip_ipaddr_t ip){
-	LCD_WriteString("IP: ");
-	LCD_WriteInt((uint8_t)(HTONS(ip[0])>>8), 10); LCD_WriteChar('.');
-	LCD_WriteInt((uint8_t)HTONS(ip[0]), 10); LCD_WriteChar('.');
-	LCD_WriteInt((uint8_t)(HTONS(ip[1])>>8), 10); LCD_WriteChar('.');
-	LCD_WriteInt((uint8_t)HTONS(ip[1]), 10); LCD_WriteChar('\n');
-}
-
 void Task_Net_Init(void){
 uip_ipaddr_t ipaddr;
 
@@ -44,7 +36,7 @@ uip_ipaddr_t ipaddr;
 	 webclient_init();
 	 resolv_init();
 
-	 MICRO_IP_PrintIp(uip_hostaddr);
+	 MISC_PrintIp((uint32_t)uip_hostaddr);
 
 	 uiplib_ipaddrconv(MICRO_IP_DNS_ADDR, (uint8_t *)ipaddr);
 	 resolv_conf(ipaddr);										// Set DNS Server Address
@@ -156,6 +148,6 @@ void webclient_datahandler(char *data, u16_t len) {
 #endif
 }
 
-void NET_SendScore(uint32_t score, char pname){
+void NET_SendScore(uint32_t score, char *pname){
 	//TODO: Get server IP and implement post method
 }

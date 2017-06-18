@@ -33,4 +33,9 @@ uint16_t rand(void);
   * */
 void MISC_countFps(void);
 
+/**
+ * @brief mostra o endereço ip no lcd
+ */
+void MISC_PrintIp(uint32_t *ip);
+
 #endif /* __misc_h__ */
