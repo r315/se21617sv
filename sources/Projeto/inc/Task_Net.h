@@ -8,13 +8,15 @@
 #define MICRO_IP_LOCAL_ADDR  "10.42.0.50"  // LPC Board Local IP address
 #define MICRO_IP_REMOTE_ADDR "10.42.0.1"   // Other cable End IP
 #define MICRO_IP_DNS_ADDR    "8.8.8.8"     // DNS Server
+#define SCORES_SERVER_ADDR  "94.62.124.97"
+#define RESOLVE_ADDR "www.isel.pt"
 
-#if DEBUG
+#ifdef DEBUG
 #define MICRO_IP_DEBUG 1
 #define WEB_DEBUG 1
 #endif
 
-#define RESOLVE_ADDR "retro.hackaday.com"
+
 
 /**
  * @brief Função que deve se ser chamada periodicamente para processar ligações

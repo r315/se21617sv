@@ -35,6 +35,13 @@ typedef struct{
     struct tm rtc;
 }SaveData;
 
+#define MAX_TOPSCORE_LEN 9      //AAA 0000\0
+
+typedef struct{
+	char name[MAX_TOPSCORE_LEN];
+}RtopScore;
+
+
 
 #define TASK_BUTTON_HEAP 		128		//128 * 4 bytes
 #define TASK_BUTTON_PRIORITY	5		// range 1:30
@@ -63,10 +70,20 @@ typedef struct{
 #define TASK_STARTUP_DEBUG ON
 #endif
 
+/**
+ * @ handle da Task main
+ */
 extern xTaskHandle *resumeTaskHandle;
 #define TASK_EXIT                                                     \
 		vTaskResume(resumeTaskHandle);	/* Retoma a Task Main */      \
 		vTaskDelete(NULL);				/* Termina a Task corrente */ \
+
+/**
+ * @brief Semaforo e fila com os topscores recebidos do servidor
+ */
+extern xQueueHandle *topscore_queue;
+extern xSemaphoreHandle *topscore_semaphore;
+
 
 /**
  * @brief Funcao chamada pela task que executa após o startup
