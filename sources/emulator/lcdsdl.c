@@ -26,7 +26,7 @@ struct LCD{
     uint32_t auto_update;
 }lcd;
 
-void LCD_Bkl(uint32_t state){
+void LCD_Bkl(uint8_t state){
 
 }
 
@@ -105,7 +105,7 @@ void LCD_IndexedColor(uint16_t *colors, uint8_t *index, uint32_t size){
     }
 }
 
-void LCD_Window(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+void LCD_Window(uint16_t x, uint16_t y, uint16_t w, uint16_t h)
 {
    lcd.wx = x;
    lcd.wy = y;

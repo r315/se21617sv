@@ -43,7 +43,7 @@ typedef int clock_time_t;
 
 
 /**
- * @brief O valor em milisegundos que decorreram desque que o sistema foi ligado..
+ * @brief retorna o Valor em milisegundos que decorreram desque que o sistema foi ligado..
  */
 int clock_time(void);
 

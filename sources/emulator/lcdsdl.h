@@ -1,6 +1,9 @@
 #ifndef _lcdsdl_h_
 #define _lcdsdl_h_
 
+#define LCD_W 240
+#define LCD_H 320
+#define LCD_SIZE (LCD_W * LCD_H)
 static const char windowTitle[] = {"lcd emulator"};
 
 void LCD_Close(void);

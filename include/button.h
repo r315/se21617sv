@@ -101,15 +101,17 @@ enum Bevent{
 
 #define BUTTON_MASK (BUTTON_L | BUTTON_R | BUTTON_F | BUTTON_S)
 
+#if !defined(__EMU__)
 #define BUTTON_GetValue()  GPIO_Read()
 #define BUTTON_SetInput(x) GPIO_SetInputN(x)
 #endif
+#endif /* __LPCXpresso__ */
 
 #if defined(__EMU__)
 #define loop BUTTON_GetEvents() != 256 //SDL_QUIT
 #else
 #define loop 1
-#endif
+#endif 
 
 #define BUTTON_DEFAULT_HOLD_TIME 2000   //2 seconds
 

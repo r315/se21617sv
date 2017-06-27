@@ -4,7 +4,7 @@ SRCS += lcdsdl.c
 SRCS += emulator.c
 SRCS += lcd.c
 SRCS += font8x16.c
-INCLUDES=-I"../../include"
+INCLUDES=-I"../../include" -I.
 
 TARGET = lcdsdltest
 
@@ -14,11 +14,11 @@ CC = gcc
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-COMPILER_FLAGS = -D_EMU_ -Wall
+COMPILER_FLAGS = -D__EMU__ -Wall
 LINKER_FLAGS = -lSDL2
 else
 DRIVE=C
-COMPILER_FLAGS = -D_EMU_ -w -Wl,-subsystem,windows
+COMPILER_FLAGS = -D__EMU__ -w -Wl,-subsystem,windows
 INCLUDES += -I$(DRIVE):/tools/SDL2/include -I$(DRIVE):/tools/SDL2/include
 LINKER_FLAGS = -L$(DRIVE):/tools/SDL2/lib -L$(DRIVE):/tools/MinGw/lib -lmingw32 -lSDL2main -lSDL2
 endif

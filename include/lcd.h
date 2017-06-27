@@ -11,7 +11,11 @@
 #define _lcd_h_
 
 #include <stdint.h>
+#if defined(__EMU__)
+#include <lcdsdl.h>
+#else
 #include <ili9341.h>
+#endif
 
 /* basic color constants */
 #define RGB(r,g,b)  (int)((r<<11) | (g<<5) | b)

@@ -2,12 +2,12 @@
 #define __misc_h__
 
 /**
- * @brief gera o checksum
+ * @brief gera o checksum para um buffer de dados
  */
 uint8_t generateChecksum(void *data, uint32_t size);
 
 /**
- * @brief calcula o checksum
+ * @brief calcula o checksum de um buffer de dados
  */
 uint8_t checksumData(void *data, uint32_t size, uint8_t checksum);
 
@@ -19,7 +19,8 @@ uint8_t checksumData(void *data, uint32_t size, uint8_t checksum);
 uint32_t strlenInPixels(char *str);
 
 /**
-  * @brief Apenas para testes de performance
+  * @brief Medicao do tempo de escrita do dispplay inteiro,
+  * Apenas para testes de performance
   * */
 void mesureDisplayDraw(void);
 
@@ -30,6 +31,7 @@ uint16_t rand(void);
 
 /**
   * @brief Contagem de frames por segundo
+  * Apenas para testes de performance
   * */
 void MISC_countFps(void);
 
