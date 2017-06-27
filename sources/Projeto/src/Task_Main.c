@@ -24,6 +24,8 @@
 #include <Task_Common.h>
 
 xTaskHandle *resumeTaskHandle;
+xQueueHandle *topscore_queue;
+xSemaphoreHandle *topscore_semaphore;
 
 #if TASK_MAIN_DEBUG
 static void LOG(char *msg){
@@ -69,6 +71,16 @@ uint8_t n;
     }
 }
 
+void MAIN_AllTimeTopScores(uint16_t x, uint16_t y, xQueueHandle *qh){
+RtopScore itm;
+	while(xQueueReceive(qh,&itm,0) == pdPASS ){
+        LCD_Goto(x,y);
+        LCD_WriteString(itm.name);
+        y += LCD_GetFontHeight();
+    }
+}
+
+
 void MAIN_Init(void *ptr){
     LCD_Clear(BLACK);
     LCD_SetColors(RED,BLACK);
@@ -76,9 +88,11 @@ void MAIN_Init(void *ptr){
     LCD_WriteString((char*)title);
 
     LCD_SetColors(YELLOW,BLACK);
-    MAIN_HighScores(96, 112, ((SaveData *)ptr)->spaceInvaders.topscores);
+    MAIN_HighScores(80, 112, ((SaveData *)ptr)->spaceInvaders.topscores);
     LCD_SetColors(GREEN,BLACK);
     BUTTON_SetHoldTime(ENTER_CONFIG_TIME);
+
+    webclient_get(SCORES_SERVER_ADDR,8080,"/emb");
 }
 
 void MAIN_Update(void){
@@ -90,6 +104,9 @@ void MAIN_Update(void){
         LCD_Goto(0,LCD_H - LCD_GetFontHeight());
         PRINT_DateTime(&rtc);
         updateTime = TIMER0_GetValue();
+        if(xSemaphoreTake(topscore_semaphore, 0)){
+        	MAIN_AllTimeTopScores(80, 112, topscore_queue);
+        }
     }
 }
 

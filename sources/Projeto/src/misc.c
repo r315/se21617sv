@@ -79,6 +79,14 @@ uint16_t rand(void){
 }
 
 void MISC_PrintIp(uint32_t *ip){
+#ifdef DEBUG
+	prinf("IP Local: %u.%u.%u.%u\n",
+			(uint8_t)(*ip>>0),
+			(uint8_t)(*ip>>8)
+			(uint8_t)(*ip>>16)
+			(uint8_t)(*ip>>24));
+#endif
+
 	LCD_WriteString("IP: ");
 	LCD_WriteInt((uint8_t)(*ip>>0), 10); LCD_WriteChar('.');
 	LCD_WriteInt((uint8_t)(*ip>>8), 10); LCD_WriteChar('.');
