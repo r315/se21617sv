@@ -125,7 +125,7 @@ void resolv_found(char *name, u16_t *ipaddr) {
 		uip_log("");
 		#endif
 		//webclient_get("http://adeetc.thothapp.com", 80, "/api/v1/classes/634");
-		webclient_get("retro.hackaday.com",80,"/");
+		//webclient_get("retro.hackaday.com",80,"/");
 	}
 }
 
@@ -142,10 +142,47 @@ void webclient_timedout(void) {
 void webclient_connected(void) {
 	WEB_log("Webclient: connected, waiting for data...\n");
 }
+
 void webclient_datahandler(char *data, u16_t len) {
+RtopScore itm;
+static uint16_t idx = 0;
+char c;
+
+	if(len > 3 * MAX_TOPSCORE_LEN)		// too much data
+		return;
+
+	if(!len){
+		#if WEB_DEBUG
+		printf("Webclient: semaphore Given\n", len);
+		#endif
+		xSemaphoreGive(topscore_semaphore);
+		return;
+	}
+
 #if WEB_DEBUG
-	printf("Webclient: got %d bytes of data.\n %s", len,data);
+	printf("Webclient: got %d bytes of data: \n", len);
 #endif
+
+	while(len--){
+		c = *data++;
+		putchar(c);
+		if(c == '\n'){
+			c = '\0';
+			itm.name[ (idx) % MAX_TOPSCORE_LEN] = c;
+			xQueueSendToBack(topscore_queue,&itm,0);
+			idx = 0;
+		}else{
+			itm.name[ (idx++) % MAX_TOPSCORE_LEN] = c;
+		}
+	}
+
+	itm.name[idx % MAX_TOPSCORE_LEN] = '\0';
+	xQueueSendToBack(topscore_queue,&itm,0);
+
+#if WEB_DEBUG
+	putchar('\n');
+#endif
+
 }
 
 void NET_SendScore(uint32_t score, char *pname){

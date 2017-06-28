@@ -129,9 +129,12 @@ int main(void){
 	    	LOG("Unable to start Micro ip Task\n");
 	    }
 
-	   if(xTaskCreate(Task_Main, "Main", TASK_MAIN_HEAP, &saveddata, TASK_MAIN_PRIORITY, NULL )   != pdPASS){
+	    if(xTaskCreate(Task_Main, "Main", TASK_MAIN_HEAP, &saveddata, TASK_MAIN_PRIORITY, NULL )   != pdPASS){
 		    LOG("Unable to start main app Task\n");
 		}
+
+	    topscore_queue = xQueueCreate(MAX_TOP_SCORES + 3, sizeof(RtopScore));
+	    vSemaphoreCreateBinary(topscore_semaphore);
 
 	    vTaskStartScheduler();
 
