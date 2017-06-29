@@ -92,17 +92,10 @@ void SYS_Init(void){
 	LCD_WriteInt(EEPROM_GetIfNumber(),10);
 	LCD_WriteChar('\n');
 
-	ETH_Init();
-	LCD_WriteString("ETH: MAC 06:05:04:03:02:01\n");
-	LCD_WriteString("ETH: PHY ID 0x");
-	LCD_WriteInt(ETH_GetPHY_ID(),16);
-	LCD_WriteChar('\n');
-
 	RTC_Init(0); //dummy value, rtc value is restored from flash
 	LCD_WriteString("RTC Initialized: NOT SET!\n");
 
 	ETH_Init();
-
 	LCD_WriteString("ETH: MAC ");LCD_WriteString(IF_MAC);
 	LCD_WriteChar('\n');
 	LCD_WriteString("ETH: PHY ID 0x");

@@ -80,10 +80,10 @@ uint16_t rand(void){
 
 void MISC_PrintIp(uint32_t *ip){
 #ifdef DEBUG
-	prinf("IP Local: %u.%u.%u.%u\n",
+	printf("IP Local: %u.%u.%u.%u\n",
 			(uint8_t)(*ip>>0),
-			(uint8_t)(*ip>>8)
-			(uint8_t)(*ip>>16)
+			(uint8_t)(*ip>>8),
+			(uint8_t)(*ip>>16),
 			(uint8_t)(*ip>>24));
 #endif
 
