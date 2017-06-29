@@ -5,16 +5,23 @@
 static uint8_t _ifmac[6];
 static EMAC_Memory *emac_memory;
 
+void blockcpy(void *dst, void *src, uint32_t size){
+	while(size--){
+		*((uint8_t*)dst++) = *((uint8_t*)src++);
+	}
+}
+
+
 uint32_t ETH_Read(void *packet){
 	uint32_t size, Index = LPC_EMAC->RxConsumeIndex;
 
 	if(Index == LPC_EMAC->RxProduceIndex)
-		return(0); 										// no new data
+		return 0; 										// no new data
 
 	size = (emac_memory->rxstatus[Index].info & 0x7FF) + 1;			//get packet size from status
 	if (size > ETH_FRAG_SIZE)size = ETH_FRAG_SIZE;		//clip size if bigger than fragment
 
-	memcpy(packet,(uint8_t *)&emac_memory->rxbuffer[Index],size);	//copy packet data
+	blockcpy(packet, (uint8_t *)&emac_memory->rxbuffer[Index], size);	//copy packet data
 
 	if(++Index > LPC_EMAC->RxDescriptorNumber)			//point to next descriptor
 		Index = 0;
@@ -41,7 +48,7 @@ uint32_t ETH_Send(void *packet, uint32_t size){
 	if (size > ETH_FRAG_SIZE)							//clip size
 		size = ETH_FRAG_SIZE;
 
-	memcpy((uint8_t *)&emac_memory->txbuffer[Index],packet,size);  //this can be optimize by changing the descriptor pointer to data
+	blockcpy((uint8_t *)&emac_memory->txbuffer[Index],packet,size);  //this can be optimize by changing the descriptor pointer to data
 	emac_memory->txdesc[Index].control &= ~0x7FF;
 	emac_memory->txdesc[Index].control |= (size-1)&0x7FF;
 
@@ -137,7 +144,9 @@ void ETH_InitPHY(void){
 		loop--;
 	 }while((phystatus & PHY_RESET) && loop);
 
-	//if(!loop) printf("PHY Reset Fail: %x", phystatus);
+#ifdef DEBUG
+	if(!loop) log("PHY Reset Fail: %x", phystatus);
+#endif
 
 	/* Setup Auto negotiation */
 	ETH_WritePHY(PHY_CR, PHY_AUTO_NEGOTIATE);
@@ -148,7 +157,9 @@ void ETH_InitPHY(void){
 		loop--;
 	}while(!(phystatus & PHY_AN_COMPLETED) && loop != 0);
 
-	//if(!loop) printf("Auto negotiation Fail: %x", phystatus);
+#ifdef DEBUG
+	if(!loop) printf("Auto negotiation Fail: %x", phystatus);
+#endif
 
 	/* Check the link status. */
 	loop = 10;
@@ -157,9 +168,18 @@ void ETH_InitPHY(void){
 		loop--;
 	}while(!(phystatus & PHY_LINK) && loop != 0);
 
-	//if(!loop) printf("No link: %x", phystatus);
+#ifdef DEBUG
+	if(!loop) printf("No link: %x", phystatus);
+#endif
 
 	/* Configure connection mode */
+#if 1
+		//full duplex mode
+		LPC_EMAC->MAC2    |= MAC2_FULL_DUP;
+		LPC_EMAC->Command |= CMD_FULL_DUP;
+		LPC_EMAC->IPGT     = IPGT_FULL_DUP;
+		LPC_EMAC->SUPP = SUPP_SPEED;
+#else
 	if(phystatus & PHY_LINK){
 		//full duplex mode
 		LPC_EMAC->MAC2    |= MAC2_FULL_DUP;
@@ -169,9 +189,10 @@ void ETH_InitPHY(void){
 		//No link detected configure half duplex mode
 		LPC_EMAC->IPGT = IPGT_HALF_DUP;
 	}
-
 	// Configure 10/100Mbit based on status
 	LPC_EMAC->SUPP = (phystatus & PHY_100FD) ? SUPP_SPEED : 0;
+#endif
+
 }
 
 uint8_t parseHex(uint8_t *h){
