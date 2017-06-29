@@ -10,7 +10,7 @@
 #include <Task_Common.h>
 
 
-#define BUF ((struct uip_eth_hdr *)&uip_buf[0])
+#define BUF ((struct uip_eth_hdr *)uip_buf)
 static struct timer periodic_timer, arp_timer;
 
 
@@ -45,7 +45,6 @@ uip_ipaddr_t ipaddr;
 
 void Task_Net(void *ptr){
 int i;
-
 	Task_Net_Init();
 
 	while (1) {
@@ -165,7 +164,9 @@ char c;
 
 	while(len--){
 		c = *data++;
+#if WEB_DEBUG
 		putchar(c);
+#endif
 		if(c == '\n'){
 			c = '\0';
 			itm.name[ (idx) % MAX_TOPSCORE_LEN] = c;
