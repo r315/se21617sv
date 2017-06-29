@@ -20,7 +20,7 @@
 #define TFT_H 320
 
 #include <stdint.h>
-#if defined(__LPC17XX__)
+#if defined(__LPCXpresso__)
 /**
 * @brief Lcd Pin configuration:
 *       P0.16  CS

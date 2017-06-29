@@ -14,7 +14,7 @@
 #define OFF 0
 #endif
 
-#if defined(__LPC17XX__)
+#if defined(__LPCXpresso__)
 #include <time_m3.h>
 #define TIMER0_GetValue() TIME_GetValue()
 #define TIMER0_Elapse(x) TIME_Elapsed(x)
