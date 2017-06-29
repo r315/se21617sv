@@ -195,61 +195,6 @@ while(1){
 			}
 		}
 	}
-
-
-#if 0
-
-
-        //main state machine
-        switch(state){
-            case IDLE:
-
-
-
-
-
-                }
-                break;
-
-            case CONFIG:
-               /* if(!config()){
-                    state = switchTo(IDLE);
-                    RTC_SetValue(&saveddata->rtc); // RTC Is saved on flash when a game is saved
-                }*/
-                break;
-
-            case GAME:
-                if(BUTTON_GetValue() == BUTTON_S){
-                    if(button.event == BUTTON_PRESSED){
-                        state = switchTo(SAVE);
-                        break;
-                    }
-                }
-                //space(BUTTON_GetValue());
-                break;
-
-            case SAVE:
-            	displaySaveResult(0x30);
-                LED_SetState(LED_ON);
-                //printf("Score: %u\n",saveddata.spaceInvaders.score);
-                // check if last score is top and insert it on table
-                saveTopScore(saveddata->spaceInvaders.score, saveddata->topscores);
-                // update gamedata with top score
-                saveddata->spaceInvaders.topscore = saveddata->topscores[0];
-
-                saveddata->checksum = generateChecksum(&saveddata->spaceInvaders, sizeof(GameData));
-
-                res = saveData(saveddata, sizeof(SaveData));
-
-                LED_SetState(LED_OFF);
-
-                displaySaveResult(res);
-
-                state = switchTo(IDLE);
-                break;
-        }
-    	#endif
-    }
-
+}
 }
 
